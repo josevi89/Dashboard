@@ -95,4 +95,12 @@
         android:layout_below="@id/notification_item_container"
         android:id="@+id/notification_info_view"/>
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:id="@+id/notification_no_info_cover"
+        android:text="No hay información adicional"
+        android:layout_below="@id/notification_info_view"
+        android:visibility="gone"/>
+
 </RelativeLayout>

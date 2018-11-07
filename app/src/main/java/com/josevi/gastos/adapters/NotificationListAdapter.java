@@ -104,9 +104,19 @@ public class NotificationListAdapter extends RecyclerView.Adapter<RecyclerView.V
                     else
                         markEventToDelete(notificationViewHolder, notification.getCode());
                 }
-                else
-                    notificationViewHolder.infoView.setVisibility(
-                            notificationViewHolder.infoView.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE);
+                else {
+                    if (notificationViewHolder.infoView.getVisibility() == View.VISIBLE
+                            || notificationViewHolder.noInfoCover.getVisibility() == View.VISIBLE) {
+                        notificationViewHolder.infoView.setVisibility(View.GONE);
+                        notificationViewHolder.noInfoCover.setVisibility(View.GONE);
+                    }
+                    else {
+                        if (notification.getInfoMap().isEmpty())
+                            notificationViewHolder.noInfoCover.setVisibility(View.VISIBLE);
+                        else
+                            notificationViewHolder.infoView.setVisibility(View.VISIBLE);
+                    }
+                }
             }
         });
     }
@@ -143,7 +153,7 @@ public class NotificationListAdapter extends RecyclerView.Adapter<RecyclerView.V
     public static class NotificationViewHolder extends RecyclerView.ViewHolder {
 
         RelativeLayout itemContainer;
-        TextView tag, title, date, time;
+        TextView tag, title, date, time, noInfoCover;
         ImageView editBtn;
         RecyclerView infoView;
 
@@ -154,6 +164,7 @@ public class NotificationListAdapter extends RecyclerView.Adapter<RecyclerView.V
             this.title = v.findViewById(R.id.notification_title);
             this.date = v.findViewById(R.id.notification_date);
             this.time = v.findViewById(R.id.notification_time);
+            this.noInfoCover = v.findViewById(R.id.notification_no_info_cover);
             this.editBtn = v.findViewById(R.id.notification_edit_btn);
             this.infoView = v.findViewById(R.id.notification_info_view);
         }
