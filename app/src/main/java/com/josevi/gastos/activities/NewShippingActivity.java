@@ -1,7 +1,6 @@
 package com.josevi.gastos.activities;
 
 import android.app.DialogFragment;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
@@ -20,7 +19,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.josevi.gastos.R;
-import com.josevi.gastos.adapters.ProductListAdapter;
+import com.josevi.gastos.adapters.ProductNewShippingListAdapter;
 import com.josevi.gastos.dialogs.TwoButtonsDialog;
 import com.josevi.gastos.fragments.ShippingFragment;
 import com.josevi.gastos.models.Product;
@@ -29,9 +28,7 @@ import com.josevi.gastos.models.enums.Group;
 import com.josevi.gastos.models.enums.Store;
 import com.josevi.gastos.repositories.ProductRepository;
 import com.josevi.gastos.repositories.ShippingRepository;
-import com.josevi.gastos.utils.Utils;
 
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,7 +46,7 @@ public class NewShippingActivity extends AppCompatActivity {
     private RecyclerView listProductsFinded;
     private TextView totalText;
     private Button viewShipping, saveShipping;
-    private ProductListAdapter productListAdapter;
+    private ProductNewShippingListAdapter productNewShippingListAdapter;
 
     private Store storeSelected;
     private List<Group> groupsSelected;
@@ -68,7 +65,7 @@ public class NewShippingActivity extends AppCompatActivity {
 
         productRepository = new ProductRepository();
         shippingRepository = new ShippingRepository();
-        productListAdapter = new ProductListAdapter(new ArrayList<Product>(), this);
+        productNewShippingListAdapter = new ProductNewShippingListAdapter(new ArrayList<Product>(), this);
 
         selectorMercadona = findViewById(R.id.new_shipping_mercadona_selector);
         selectorEstanco = findViewById(R.id.new_shipping_estanco_selector);
@@ -107,9 +104,10 @@ public class NewShippingActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (storeSelected != Store.MERCADONA) {
-                    if (!shipping.getShipping().isEmpty()) {
-                        final TwoButtonsDialog dialog = new TwoButtonsDialog(NewShippingActivity.this);
-                        dialog.setMessage("Si cambias de establecimiento se reiniciará la compra.");
+                    if (!shipping.isEmpty()) {
+                        final TwoButtonsDialog dialog = new TwoButtonsDialog(NewShippingActivity.this, R.color.red_app);
+                        dialog.setMessage("Si cambias de establecimiento, se reiniciará la compra.");
+//                        dialog.setLeftButtonColor(getResources().getColor(R.color.red_app));
                         dialog.setLeftButtonListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
@@ -130,9 +128,10 @@ public class NewShippingActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (storeSelected != Store.ESTANCO) {
-                    if (!shipping.getShipping().isEmpty()) {
-                        final TwoButtonsDialog dialog = new TwoButtonsDialog(NewShippingActivity.this);
-                        dialog.setMessage("Si cambias de establecimiento se reiniciará la compra.");
+                    if (!shipping.isEmpty()) {
+                        final TwoButtonsDialog dialog = new TwoButtonsDialog(NewShippingActivity.this, R.color.red_app);
+                        dialog.setMessage("Si cambias de establecimiento, se reiniciará la compra.");
+//                        dialog.setLeftButtonColor(getResources().getColor(R.color.red_app));
                         dialog.setLeftButtonListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
@@ -215,6 +214,94 @@ public class NewShippingActivity extends AppCompatActivity {
             }
         });
 
+        checkPrepared.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                if (checked)
+                    groupsSelected.add(Group.PREPARED);
+                else
+                    groupsSelected.remove(Group.PREPARED);
+                reloadProductsFinded();
+            }
+        });
+
+        checkBread.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                if (checked)
+                    groupsSelected.add(Group.BREAD);
+                else
+                    groupsSelected.remove(Group.BREAD);
+                reloadProductsFinded();
+            }
+        });
+
+        checkAnimal.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                if (checked)
+                    groupsSelected.add(Group.ANIMALS);
+                else
+                    groupsSelected.remove(Group.ANIMALS);
+                reloadProductsFinded();
+            }
+        });
+
+        checkVegetables.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                if (checked)
+                    groupsSelected.add(Group.VEGETABLES);
+                else
+                    groupsSelected.remove(Group.VEGETABLES);
+                reloadProductsFinded();
+            }
+        });
+
+        checkOthers.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                if (checked)
+                    groupsSelected.add(Group.OTHER);
+                else
+                    groupsSelected.remove(Group.OTHER);
+                reloadProductsFinded();
+            }
+        });
+
+        checkTobacco.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                if (checked)
+                    groupsSelected.add(Group.TOBACCO);
+                else
+                    groupsSelected.remove(Group.TOBACCO);
+                reloadProductsFinded();
+            }
+        });
+
+        checkPaper.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                if (checked)
+                    groupsSelected.add(Group.PAPER);
+                else
+                    groupsSelected.remove(Group.PAPER);
+                reloadProductsFinded();
+            }
+        });
+
+        checkFilters.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                if (checked)
+                    groupsSelected.add(Group.FILTERS);
+                else
+                    groupsSelected.remove(Group.FILTERS);
+                reloadProductsFinded();
+            }
+        });
+
         findProduct.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -256,7 +343,7 @@ public class NewShippingActivity extends AppCompatActivity {
         });
 
         listProductsFinded.setLayoutManager(new LinearLayoutManager(this));
-        listProductsFinded.setAdapter(productListAdapter);
+        listProductsFinded.setAdapter(productNewShippingListAdapter);
 
 //        listProductsFinded.addOnScrollListener(new EndlessRecyclerViewScrollListener(mLayoutManager) {
 //            @Override
@@ -272,7 +359,7 @@ public class NewShippingActivity extends AppCompatActivity {
 //            }
 //        });
 
-        productListAdapter.notifyDataSetChanged();
+        productNewShippingListAdapter.notifyDataSetChanged();
 
         viewShipping.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -283,13 +370,14 @@ public class NewShippingActivity extends AppCompatActivity {
                 shippingBundle.putParcelable(SHIPPING_FRAGMENT_SHIPPING, shipping);
                 shippingFragment.setArguments(shippingBundle);
                 shippingFragment.show(getFragmentManager(), SHIPPING_FRAGMENT_TAG);
+                findProduct.setText("");
             }
         });
 
         saveShipping.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!shipping.getShipping().isEmpty()) {
+                if (!shipping.isEmpty()) {
                     shippingRepository.addShippingToDb(shipping);
                     NewShippingActivity.super.onBackPressed();
                 }
@@ -323,17 +411,27 @@ public class NewShippingActivity extends AppCompatActivity {
     }
 
     public int getQtyFromProductCode(String code) {
-        if (shipping.getShipping().containsKey(code))
-            return shipping.getShipping().get(code).first;
+        if (shipping.containsKey(code))
+            return shipping.get(code).first;
         else
             return 0;
     }
 
-    public void setPrizeToProduct(String code, double prize) {
-        if (shipping.getShipping().containsKey(code))
-            shipping.getShipping().put(code, new Pair(shipping.getShipping().get(code).first, prize));
+    public Double getPrizeSettedFromProductCode(String code) {
+        if (shipping.containsKey(code))
+            return shipping.get(code).second;
         else
-            shipping.getShipping().put(code, new Pair(1, prize));
+            return null;
+    }
+
+    public void setPrizeToProduct(String code, double prize) {
+        if (shipping.containsKey(code))
+            shipping.put(code, new Pair(shipping.get(code).first, prize));
+        else
+            shipping.put(code, new Pair(1, prize));
+        viewShipping.setEnabled(true);
+        saveShipping.setEnabled(true);
+        reloadTotal();
     }
 
     public void addProductToShipping(String code) {
@@ -352,7 +450,7 @@ public class NewShippingActivity extends AppCompatActivity {
 
     public void deleteProductFromShipping(String code) {
         shipping.deleteProduct(code);
-        if (shipping.getShipping().isEmpty()) {
+        if (shipping.isEmpty()) {
             saveShipping.setEnabled(false);
             viewShipping.setEnabled(false);
         }
@@ -364,11 +462,16 @@ public class NewShippingActivity extends AppCompatActivity {
     }
 
     public void reloadProductsFinded() {
-        if (findProduct.getText() != null && !findProduct.getText().toString().isEmpty())
-            productsFinded = productRepository.findProductsFromStoreAndGroups(storeSelected, groupsSelected, findProduct.getText().toString());
+        if (findProduct.getText() != null && !findProduct.getText().toString().isEmpty()) {
+            if (storeSelected == Store.ESTANCO && findProduct.getText().toString().equals("Roswelll")) {
+                productsFinded = productRepository.getRollProducts();
+            }
+            else
+                productsFinded = productRepository.findProductsFromStoreAndGroups(storeSelected, groupsSelected, findProduct.getText().toString());
+        }
         else
             productsFinded = new ArrayList<Product>();
-        productListAdapter.setProducts(productsFinded);
+        productNewShippingListAdapter.setProducts(productsFinded);
     }
 
     public void uncheckAllGroups() {
@@ -387,5 +490,22 @@ public class NewShippingActivity extends AppCompatActivity {
         checkPaper.setChecked(false);
         checkFilters.setChecked(false);
         this.groupsSelected = new ArrayList<Group>();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (!shipping.isEmpty()) {
+            TwoButtonsDialog exitDialog = new TwoButtonsDialog(this, R.color.red_app);
+            exitDialog.setMessage("Si sales, se perderá la compra.");
+            exitDialog.setLeftButtonListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    NewShippingActivity.super.onBackPressed();
+                }
+            });
+            exitDialog.show();
+        }
+        else
+            NewShippingActivity.super.onBackPressed();
     }
 }

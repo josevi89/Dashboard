@@ -3,6 +3,7 @@ package com.josevi.gastos.models;
 import android.database.Cursor;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.support.v4.util.Pair;
 
 import com.josevi.gastos.db.DBContract;
@@ -14,16 +15,18 @@ import com.josevi.gastos.utils.Utils;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.josevi.gastos.utils.Constantes.dateFormat;
 import static com.josevi.gastos.utils.Constantes.dayDateFormat;
 import static com.josevi.gastos.utils.Constantes.shortDateFormat;
 
-public class Shipping implements Parcelable{
+public class Shipping implements Parcelable, Comparable<Shipping>, Map<String, Pair<Integer, Double>>{
 
     private String id;
     private Map<String, Pair<Integer, Double>> shipping;
@@ -65,7 +68,7 @@ public class Shipping implements Parcelable{
             catch (ParseException pe2) {}
         }
         this.others = cur.getDouble(cur.getColumnIndex(DBContract.ShippingsEntry.COLUMN_OTHERS));
-        this.shipping = Utils.parseShipping(cur.getString(cur.getColumnIndex(DBContract.ShippingsEntry.COLUMN_SHIPPING)));
+        this.setShippingParsed(cur.getString(cur.getColumnIndex(DBContract.ShippingsEntry.COLUMN_SHIPPING)));
     }
 
     public String getId() {
@@ -108,10 +111,6 @@ public class Shipping implements Parcelable{
         }
     };
 
-    public Map<String, Pair<Integer, Double>> getShipping() {
-        return shipping;
-    }
-
     public Date getDate() {
         return date;
     }
@@ -119,6 +118,28 @@ public class Shipping implements Parcelable{
     public void setDate(Date date) {
         this.date = date;
         generateId();
+    }
+
+    public String getShippingFormated() {
+        String shippingFormatted = "";
+        for(String productBought: shipping.keySet())
+            shippingFormatted += productBought +","
+                    +String.valueOf(shipping.get(productBought).first) +","
+                    +(shipping.get(productBought).second != null ?
+                    String.format("%.2f", shipping.get(productBought).second) : -1) +"-";
+        return shippingFormatted.substring(0, shippingFormatted.length() - 1);
+    }
+
+    public void setShippingParsed(String shipping) {
+        Map<String, Pair<Integer, Double>> shippingParsed = new HashMap<String, Pair<Integer, Double>>();
+        for(String productBought: shipping.split("-")) {
+            Double prize = Double.parseDouble(productBought.split(",")[2]);
+            if (prize == -1)
+                prize = null;
+            shippingParsed.put(productBought.split(",")[0],
+                    new Pair(Integer.parseInt(productBought.split(",")[1]), prize));
+        }
+        this.shipping = shippingParsed;
     }
 
     public void addProduct(String code) {
@@ -171,7 +192,6 @@ public class Shipping implements Parcelable{
         return toExport;
     }
 
-
     @Override
     public int describeContents() {
         return 0;
@@ -213,5 +233,91 @@ public class Shipping implements Parcelable{
             }
         }
         this.others = in.readDouble();
+    }
+
+    @Override
+    public int compareTo(@NonNull Shipping other) {
+        Calendar thisDate = Calendar.getInstance(), otherDate = Calendar.getInstance();
+        if (this.date != null && other.getDate() != null) {
+            thisDate.setTime(this.date);
+            otherDate.setTime(other.getDate());
+            if (thisDate.after(otherDate))
+                return 1;
+            else if (thisDate.before(otherDate))
+                return -1;
+            else
+                return 0;
+        }
+        else if (thisDate == null && otherDate == null)
+            return 0;
+        else if (thisDate != null)
+            return 1;
+        else
+            return -1;
+    }
+
+    @Override
+    public int size() {
+        return shipping.size();
+    }
+
+    @Override
+    public boolean isEmpty() {
+        if (shipping == null)
+            shipping = new HashMap<String, Pair<Integer, Double>>();
+        return shipping.isEmpty();
+    }
+
+    @Override
+    public boolean containsKey(Object o) {
+        return shipping.containsKey(o);
+    }
+
+    @Override
+    public boolean containsValue(Object o) {
+        return shipping.containsValue(o);
+    }
+
+    @Override
+    public Pair<Integer, Double> get(Object o) {
+        return shipping.get(o);
+    }
+
+    @Override
+    public Pair<Integer, Double> put(String s, Pair<Integer, Double> integerDoublePair) {
+        return shipping.put(s, integerDoublePair);
+    }
+
+    @Override
+    public Pair<Integer, Double> remove(Object o) {
+        return shipping.remove(o);
+    }
+
+    @Override
+    public void putAll(@NonNull Map<? extends String, ? extends Pair<Integer, Double>> map) {
+        shipping.putAll(map);
+    }
+
+    @Override
+    public void clear() {
+        shipping.clear();
+    }
+
+    @NonNull
+    @Override
+    public Set<String> keySet() {
+        return shipping.keySet();
+    }
+
+    @NonNull
+    @Override
+    public Collection<Pair<Integer, Double>> values() {
+        return shipping.values();
+    }
+
+    @NonNull
+    @Override
+    public Set<Entry<String, Pair<Integer, Double>>> entrySet() {
+        return shipping.entrySet();
     }
 }

@@ -17,6 +17,7 @@ import android.widget.TimePicker;
 import com.josevi.gastos.R;
 import com.josevi.gastos.adapters.NotificationInfoListAdapter;
 import com.josevi.gastos.dialogs.OneButtonDialog;
+import com.josevi.gastos.dialogs.TwoButtonsDialog;
 import com.josevi.gastos.models.Notification;
 import com.josevi.gastos.models.enums.NotificationTag;
 import com.josevi.gastos.repositories.NotificationRepository;
@@ -183,5 +184,22 @@ public class NewNotificationActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (!title.getText().toString().isEmpty() || !infoMap.isEmpty()) {
+            TwoButtonsDialog exitDialog = new TwoButtonsDialog(this, R.color.red_app);
+            exitDialog.setMessage("Si sales, se perderán los cambios.");
+            exitDialog.setLeftButtonListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    NewNotificationActivity.super.onBackPressed();
+                }
+            });
+            exitDialog.show();
+        }
+        else
+            NewNotificationActivity.super.onBackPressed();
     }
 }

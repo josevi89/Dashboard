@@ -72,11 +72,18 @@ public class ProductRepository {
         List<Product> estancoPaper = new ArrayList<Product>();
         estancoPaper.add(new Product("Greengo", "EPA0", 0.50, Store.ESTANCO, Group.PAPER));
         List<Product> estancoFilters = new ArrayList<Product>();
+        List<Product> estancoRollA = new ArrayList<Product>();
+        estancoRollA.add(new Product("A (2g)", "ERA0", 10, Store.ESTANCO, Group.ROLL_A));
+        List<Product> estancoRollB = new ArrayList<Product>();
+        estancoRollB.add(new Product("B (2g)", "ERB0", 10, Store.ESTANCO, Group.ROLL_B));
+        estancoRollB.add(new Product("B (50g)", "ERB1", 170, Store.ESTANCO, Group.ROLL_B));
 
         Map<Group, List<Product>> estancoMap = new HashMap<Group, List<Product>>();
         estancoMap.put(Group.TOBACCO, estancoTobacco);
         estancoMap.put(Group.PAPER, estancoPaper);
         estancoMap.put(Group.FILTERS, estancoFilters);
+        estancoMap.put(Group.ROLL_A, estancoRollA);
+        estancoMap.put(Group.ROLL_B, estancoRollB);
 
         Map<Store, Map<Group, List<Product>>> productsMap = new HashMap<Store, Map<Group, List<Product>>>();
         productsMap.put(Store.MERCADONA, mercadonaMap);
@@ -96,6 +103,13 @@ public class ProductRepository {
                         if (product.getName().toLowerCase().trim().contains(text.toLowerCase().trim()))
                             productsToReturn.add(product);
         return productsToReturn;
+    }
+
+    public List<Product> getRollProducts() {
+        List<Product> products = new ArrayList<Product>();
+        products.addAll(productsMap.get(Store.ESTANCO).get(Group.ROLL_A));
+        products.addAll(productsMap.get(Store.ESTANCO).get(Group.ROLL_B));
+        return products;
     }
 
     public Product findProductByCode(String code) {
@@ -153,6 +167,12 @@ public class ProductRepository {
                         break;
                     case "FI":
                         group = Group.FILTERS;
+                        break;
+                    case "RA":
+                        group = Group.ROLL_A;
+                        break;
+                    case "RB":
+                        group = Group.ROLL_B;
                         break;
                     default:
                         return null;

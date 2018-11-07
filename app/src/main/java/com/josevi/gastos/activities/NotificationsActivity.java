@@ -188,7 +188,7 @@ public class NotificationsActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 boolean onlyOne = true;
-                final TwoButtonsDialog deleteDialog = new TwoButtonsDialog(NotificationsActivity.this);
+                final TwoButtonsDialog deleteDialog = new TwoButtonsDialog(NotificationsActivity.this, R.color.blue_app);
                 deleteDialog.setMessage("Se borrará" +(onlyOne ? "" : "n") +" " +"1" +" noticicaci" +(onlyOne ? "ón." : "ones."));
                 deleteDialog.setLeftButtonListener(new View.OnClickListener() {
                     @Override
@@ -209,7 +209,7 @@ public class NotificationsActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         if (deleteBtn.getVisibility() == View.VISIBLE) {
-            final TwoButtonsDialog backDialog = new TwoButtonsDialog(this);
+            final TwoButtonsDialog backDialog = new TwoButtonsDialog(this, R.color.blue_app);
             backDialog.setMessage("Si sale, no se borrarán los eventos marcados.");
             backDialog.setLeftButtonListener(new View.OnClickListener() {
                 @Override

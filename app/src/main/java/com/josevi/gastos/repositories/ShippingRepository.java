@@ -168,13 +168,13 @@ public class ShippingRepository {
 
     public void addShippingToDb(Shipping newShipping) {
         if (newShipping.getStore() != null && newShipping.getDate() != null &&
-                newShipping.getShipping() != null && newShipping.getShipping().isEmpty()) {
+                newShipping.isEmpty()) {
             Vector<ContentValues> cVVector = new Vector<ContentValues>(1);
             ContentValues values = new ContentValues();
             values.put(DBContract.ShippingsEntry.COLUMN_ID, newShipping.getId());
             values.put(DBContract.ShippingsEntry.COLUMN_DATE, dateFormat.format(newShipping.getDate()));
             values.put(DBContract.ShippingsEntry.COLUMN_STORE, newShipping.getStore().ordinal());
-            values.put(DBContract.ShippingsEntry.COLUMN_SHIPPING, Utils.formatShipping(newShipping.getShipping()));
+            values.put(DBContract.ShippingsEntry.COLUMN_SHIPPING, newShipping.getShippingFormated());
             values.put(DBContract.ShippingsEntry.COLUMN_OTHERS, newShipping.getOthers());
 
             cVVector.add(values);

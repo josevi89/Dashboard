@@ -9,7 +9,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/product_item_container"
+        android:id="@+id/product_new_shipping_item_container"
         android:gravity="center_vertical">
 
         <LinearLayout
@@ -19,7 +19,7 @@
             android:gravity="center_vertical">
 
             <TextView
-                android:id="@+id/product_name"
+                android:id="@+id/product_new_shipping_name"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_centerVertical="true"
@@ -39,15 +39,14 @@
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:layout_marginLeft="10dp"
-            android:id="@+id/product_set_qty_container"
+            android:id="@+id/product_new_shipping_set_qty_container"
             android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:visibility="gone">
+            android:gravity="center_vertical">
 
             <TextView
-                android:layout_width="40dp"
+                android:layout_width="50dp"
                 android:layout_height="wrap_content"
-                android:id="@+id/product_prize"
+                android:id="@+id/product_new_shipping_prize"
                 android:textSize="12dp"
                 android:text="prize"/>
 
@@ -65,7 +64,7 @@
                 android:text="10"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:id="@+id/product_qty"/>
+                android:id="@+id/product_new_shipping_qty"/>
 
             <ImageView
                 android:layout_width="20dp"
@@ -83,28 +82,30 @@
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:layout_marginLeft="10dp"
-            android:id="@+id/product_edit_prize_container"
+            android:id="@+id/product_new_shipping_edit_prize_container"
             android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:visibility="gone">
 
             <EditText
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:backgroundTint="@color/red_app"
-                android:id="@+id/product_new_prize"/>
+                android:id="@+id/product_new_shipping_new_prize"
+                android:inputType="numberDecimal"/>
 
             <ImageView
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:layout_centerVertical="true"
-                android:id="@+id/product_new_prize_button"
+                android:id="@+id/product_new_shipping_new_prize_button"
                 android:src="@mipmap/icon_edit_red"/>
 
             <ImageView
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:layout_centerVertical="true"
-                android:id="@+id/product_cancel_set_new_prize_button"
+                android:id="@+id/product_new_shipping_cancel_set_new_prize_button"
                 android:src="@mipmap/icon_remove_black"/>
 
 
