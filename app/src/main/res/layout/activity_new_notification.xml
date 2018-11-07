@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/new_notification_header">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center_horizontal"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:id="@+id/new_notification_header_buttons"
+            android:backgroundTint="@color/blue_app"
+            android:background="@color/blue_app">
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@mipmap/icon_calendar_blue"
+                android:id="@+id/new_notification_event_selector"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/new_notification_body"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/new_notification_header"
+        android:orientation="vertical"
+        android:padding="10dp">
+
+        <LinearLayout
+            android:id="@+id/new_notification_date_selector"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginBottom="10dp"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:id="@+id/new_notification_day_btn"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@mipmap/icon_calendar_blue" />
+
+            <TextView
+                android:id="@+id/new_notification_day_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:layout_marginRight="10dp"
+                android:text="dd MMM yyyy" />
+
+            <ImageView
+                android:id="@+id/new_notification_time_btn"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@mipmap/icon_time_blue" />
+
+            <TextView
+                android:id="@+id/new_notification_time_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:layout_marginRight="10dp"
+                android:text="HH:mm" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Título:" />
+
+            <EditText
+                android:id="@+id/new_notification_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/blue_app"
+                android:inputType="text"
+                android:maxLines="1"
+                android:paddingEnd="20dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:paddingStart="20dp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Información adicional:" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/new_notification_new_info_key"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@color/blue_app"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:paddingEnd="2dp"
+                    android:paddingLeft="2dp"
+                    android:paddingRight="2dp"
+                    android:paddingStart="2dp" />
+
+                <TextView
+                    android:layout_width="20dp"
+                    android:layout_height="wrap_content"
+                    android:text="-"
+                    android:textAlignment="center"/>
+
+                <EditText
+                    android:id="@+id/new_notification_new_info_info"
+                    android:layout_width="230dp"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@color/blue_app"
+                    android:inputType="text"
+                    android:paddingEnd="2dp"
+                    android:paddingLeft="2dp"
+                    android:paddingRight="2dp"
+                    android:paddingStart="2dp" />
+
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginStart="10dp"
+                    android:src="@mipmap/icon_add_blue"
+                    android:id="@+id/new_notification_add_new_info_btn"/>
+
+            </LinearLayout>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/new_notification_info_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_marginBottom="10dp"
+        android:gravity="bottom"
+        android:layout_gravity="bottom"
+        android:layout_below="@+id/new_notification_body">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="5dp"
+            android:gravity="center">
+
+            <Button
+                android:layout_width="100dp"
+                android:layout_height="30dp"
+                android:textAllCaps="true"
+                android:backgroundTint="@color/blue_app"
+                android:text="Guardar"
+                android:textColor="@color/white"
+                android:padding="5dp"
+                android:textSize="12sp"
+                android:id="@+id/new_notification_save_btn"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>

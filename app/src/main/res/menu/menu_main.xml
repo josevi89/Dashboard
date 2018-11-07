@@ -1,0 +1,15 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.medicsen.couchbasetesting.MainActivity">
+    <item
+        android:id="@+id/action_user_medical"
+        android:orderInCategory="100"
+        android:title="Medical"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_user_personal"
+        android:orderInCategory="100"
+        android:title="Personal"
+        app:showAsAction="never" />
+</menu>

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="3dp"
+    android:id="@+id/item_view_notification_info"
+    android:gravity="center_vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/notification_item_container"
+        android:gravity="center_vertical">
+
+        <LinearLayout
+            android:id="@+id/notification_notification_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/notification_tag"
+                android:layout_width="70dp"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="10dp"
+                android:layout_marginStart="10dp"
+                android:text="TAG"
+                android:textAlignment="viewStart" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:id="@+id/notification_info_container"
+            android:orientation="horizontal"
+            android:layout_toRightOf="@id/notification_notification_container"
+            android:layout_toEndOf="@id/notification_notification_container"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:layout_width="180dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/notification_title"
+                android:text="Título"
+                android:textColor="@color/blue_app"
+                android:textStyle="bold"/>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/notification_date"
+                    android:text="dd MMM yyyy"
+                    android:textAlignment="textEnd"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/notification_time"
+                    android:text="HH:mm"
+                    android:textAlignment="textEnd"/>
+
+            </LinearLayout>
+
+            <!--<TextView-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:id="@+id/notification_date"-->
+                <!--android:text="dd MMM yyyy HH:mm"-->
+                <!--android:textAlignment="textEnd"/>-->
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginLeft="10dp"
+                android:src="@mipmap/icon_edit_blue"
+                android:id="@+id/notification_edit_btn"/>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/notification_item_container"
+        android:id="@+id/notification_info_view"/>
+
+</RelativeLayout>

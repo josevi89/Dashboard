@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="green_app">#009900</color>
+    <color name="red_app">#CC0000</color>
+    <color name="blue_app">#0000BB</color>
+    <color name="purple_app">#AA00AA</color>
+
+    <color name="green_app_light">#BBFFBB</color>
+    <color name="red_app_light">#FFBBBB</color>
+    <color name="blue_app_light">#CCCCFF</color>
+    <color name="purple_app_light">#FFBBFF</color>
+
+    <color name="green">#00FF00</color>
+    <color name="red">#FF0000</color>
+    <color name="blue">#0000FF</color>
+    <color name="purle">#AA00AA</color>
+
+    <color name="green_mercadona">#008800</color>
+    <color name="brown_estanco">#964B00</color>
+    <color name="blue_caixa">#2222FF</color>
+    <color name="red_alimentation">#FF0000</color>
+
+    <color name="green_a">#00C800</color>
+    <color name="brewn_b">#C86400</color>
+</resources>
