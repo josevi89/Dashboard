@@ -48,7 +48,7 @@ public class ProductListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
         productViewHolder.name.setText(product.getName());
         if (product.getPrize() != -1) {
-            productViewHolder.prize.setText(String.format(Utils.getDecimalFormat(2, product.getPrize())) + " €");
+            productViewHolder.prize.setText(String.format(String.format("%.2f", product.getPrize())) + " €");
             productViewHolder.setNewPrizeContainer.setVisibility(View.VISIBLE);
             productViewHolder.setQtyContainer.setVisibility(View.GONE);
         }
@@ -94,7 +94,7 @@ public class ProductListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             public void onClick(View view) {
                 if(!productViewHolder.newPrize.getText().toString().isEmpty()) {
                     double prize = Double.parseDouble(productViewHolder.newPrize.getText().toString());
-                    productViewHolder.prize.setText(Utils.getDecimalFormat(2, prize));
+                    productViewHolder.prize.setText(String.format("%.2f", prize));
                     ((NewShippingActivity)activity).setPrizeToProduct(product.getCode(), prize);
                     productViewHolder.setQtyContainer.setVisibility(View.VISIBLE);
                     productViewHolder.setNewPrizeContainer.setVisibility(View.GONE);

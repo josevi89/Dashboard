@@ -360,7 +360,7 @@ public class NewShippingActivity extends AppCompatActivity {
     }
 
     public void reloadTotal() {
-        totalText.setText(Utils.getDecimalFormat(2, shipping.getTotalPrize()));
+        totalText.setText(String.format("%.2f", shipping.getTotalPrize()));
     }
 
     public void reloadProductsFinded() {

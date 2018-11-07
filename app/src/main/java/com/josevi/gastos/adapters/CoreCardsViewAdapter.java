@@ -96,7 +96,7 @@ public class CoreCardsViewAdapter extends RecyclerView.Adapter<RecyclerView.View
         for (List<Shipping> dayShippings: monthShippings.get(1))
             for (Shipping shipping: dayShippings)
                 total += shipping.getTotalPrize();
-        viewHolderGastos.totalText.setText(Utils.getDecimalFormat(2, total) +" €");
+        viewHolderGastos.totalText.setText(String.format("%.2f", total) +" €");
         configureGastosCoreChart(viewHolderGastos.gastosChart);
         setGastosCoreChartData(viewHolderGastos.gastosChart, monthShippings);
     }
@@ -126,7 +126,7 @@ public class CoreCardsViewAdapter extends RecyclerView.Adapter<RecyclerView.View
         leftAxis.setValueFormatter(new IAxisValueFormatter() {
             @Override
             public String getFormattedValue(float value, AxisBase axis) {
-                return Utils.getDecimalFormat(2, value);
+                return String.format("%.2f", value);
             }
         });
         leftAxis.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);

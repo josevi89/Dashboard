@@ -7,10 +7,6 @@ import java.util.Map;
 
 public class Utils {
 
-    public static String getDecimalFormat(int numDecimal, double value) {
-        return String.format("%."+String.valueOf(numDecimal) +"f", value);
-    }
-
     public static Map<String, Pair<Integer, Double>> parseShipping(String shipping) {
         Map<String, Pair<Integer, Double>> shippingParsed = new HashMap<String, Pair<Integer, Double>>();
         for(String productBought: shipping.split("-")) {
@@ -29,7 +25,7 @@ public class Utils {
             shippingFormatted += productBought +","
                     +String.valueOf(shipping.get(productBought).first) +","
                     +(shipping.get(productBought).second != null ?
-                    Utils.getDecimalFormat(2,shipping.get(productBought).second) : -1) +"-";
+                    String.format("%.2f", shipping.get(productBought).second) : -1) +"-";
         return shippingFormatted.substring(0, shippingFormatted.length() - 1);
     }
 
