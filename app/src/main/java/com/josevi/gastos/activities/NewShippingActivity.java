@@ -441,13 +441,6 @@ public class NewShippingActivity extends AppCompatActivity {
         reloadTotal();
     }
 
-    public void addProductToShipping(String code, double prize) {
-        shipping.addProduct(code);
-        viewShipping.setEnabled(true);
-        saveShipping.setEnabled(true);
-        reloadTotal();
-    }
-
     public void deleteProductFromShipping(String code) {
         shipping.deleteProduct(code);
         if (shipping.isEmpty()) {
