@@ -12,6 +12,7 @@ import com.josevi.gastos.db.DBContract;
 import com.josevi.gastos.models.Shipping;
 import com.josevi.gastos.models.enums.Store;
 import com.josevi.gastos.utils.Utils;
+import com.prolificinteractive.materialcalendarview.CalendarDay;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -90,7 +91,48 @@ public class ShippingRepository {
         shippingsMap.get(year).get(month).get(day).add(shipping);
     }
 
-    public List<List<Shipping>> getShippingsInMonth(Calendar date) {
+    public List<Shipping> getShippingsInMonth(Calendar date) {
+        String[] dateSplitted = dayDateFormat.format(date.getTime()).split("/");
+        Integer month = Integer.parseInt(dateSplitted[1]),
+                year = Integer.parseInt(dateSplitted[2]);
+        List<Shipping> shippingsToReturn = new ArrayList<Shipping>();
+        for (int d = 1; d <= 31; d++)
+            try {
+                shippingsToReturn.addAll(shippingsMap.get(year).get(month).get(d));
+            }
+            catch (Exception e){}
+        return shippingsToReturn;
+    }
+
+    public List<Shipping> getShippingsInDay(Calendar date) {
+        String[] dateSplitted = dayDateFormat.format(date.getTime()).split("/");
+        Integer day = Integer.parseInt(dateSplitted[0]),
+                month = Integer.parseInt(dateSplitted[1]),
+                year = Integer.parseInt(dateSplitted[2]);
+        try {
+            return shippingsMap.get(year).get(month).get(day);
+        }
+        catch (Exception e){}
+        return new ArrayList<Shipping>();
+    }
+
+    public List<CalendarDay> getShippingDatesInMonth(Calendar date) {
+        Integer year = date.get(Calendar.YEAR),
+                month = date.get(Calendar.MONTH) + 1;
+        List<CalendarDay> datesToReturn = new ArrayList<CalendarDay>();
+        for (int d = 1; d < 31; d++) {
+            try {
+                if (!shippingsMap.get(year).get(month).get(d).isEmpty()) {
+                    Calendar day = Calendar.getInstance();
+                    day.set(year, month - 1, d, 0, 0, 0);
+                    datesToReturn.add(new CalendarDay(day));
+                }
+            } catch (Exception e) {}
+        }
+        return datesToReturn;
+    }
+
+    public List<List<Shipping>> getShippingsInMonthGroupped(Calendar date) {
         String[] dateSplitted = dayDateFormat.format(date.getTime()).split("/");
         Integer month = Integer.parseInt(dateSplitted[1]),
                 year = Integer.parseInt(dateSplitted[2]);
@@ -120,11 +162,11 @@ public class ShippingRepository {
 
     public List<List<List<Shipping>>> getShippingsInThreeMonths(Calendar date) {
         List<List<List<Shipping>>> monthShippings = new ArrayList<List<List<Shipping>>>();
-        monthShippings.add(getShippingsInMonth(date));
+        monthShippings.add(getShippingsInMonthGroupped(date));
         date.add(Calendar.MONTH, -1);
-        monthShippings.add(getShippingsInMonth(date));
+        monthShippings.add(getShippingsInMonthGroupped(date));
         date.add(Calendar.MONTH, -1);
-        monthShippings.add(getShippingsInMonth(date));
+        monthShippings.add(getShippingsInMonthGroupped(date));
         return monthShippings;
     }
 

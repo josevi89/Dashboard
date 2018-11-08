@@ -35,7 +35,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/image/ic_nature_people_black_24dp.xml" />
+                                                <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/editor/ic_format_list_bulleted_black_24dp.xml" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -45,9 +45,8 @@
                                   </option>
                                   <option name="values">
                                     <map>
-                                      <entry key="backgroundColor" value="aa00aa" />
-                                      <entry key="iconShape" value="CIRCLE" />
-                                      <entry key="outputName" value="icon_app_round" />
+                                      <entry key="backgroundColor" value="cc0000" />
+                                      <entry key="outputName" value="icon_list_red_unchecked" />
                                     </map>
                                   </option>
                                 </PersistentState>
