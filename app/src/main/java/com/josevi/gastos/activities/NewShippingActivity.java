@@ -1,6 +1,8 @@
 package com.josevi.gastos.activities;
 
+import android.app.DatePickerDialog;
 import android.app.DialogFragment;
+import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
@@ -12,10 +14,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.TimePicker;
 
 import com.josevi.gastos.R;
 import com.josevi.gastos.adapters.ProductNewShippingListAdapter;
@@ -29,15 +33,20 @@ import com.josevi.gastos.repositories.ProductRepository;
 import com.josevi.gastos.repositories.ShippingRepository;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import static com.josevi.gastos.utils.Constantes.SHIPPING_EDIT;
 import static com.josevi.gastos.utils.Constantes.SHIPPING_FRAGMENT_SHIPPING;
 import static com.josevi.gastos.utils.Constantes.SHIPPING_FRAGMENT_TAG;
+import static com.josevi.gastos.utils.Constantes.prettyDayDateFormat;
+import static com.josevi.gastos.utils.Constantes.timeDateFormat;
 
 public class NewShippingActivity extends AppCompatActivity {
 
     private ImageView selectorMercadona, selectorEstanco;
+    private ImageView daySelector, timeSelector;
+    private TextView dayLabel, timeLabel;
     private LinearLayout checksGroupsMercadona, checksGroupsEstanco;
     private CheckBox checkMeat, checkFish, checkMilk, checkBreakfast, checkDrinks, checkFrozen,
             checkBread, checkPrepared, checkAnimal, checkVegetables, checkOthers;
@@ -52,6 +61,7 @@ public class NewShippingActivity extends AppCompatActivity {
     private List<Group> groupsSelected;
     private List<Product> productsFinded;
     private Shipping shipping;
+    private Calendar dateSelected;
 
     private ProductRepository productRepository;
     private ShippingRepository shippingRepository;
@@ -76,6 +86,11 @@ public class NewShippingActivity extends AppCompatActivity {
 
         selectorMercadona = findViewById(R.id.new_shipping_mercadona_selector);
         selectorEstanco = findViewById(R.id.new_shipping_estanco_selector);
+
+        daySelector = findViewById(R.id.new_shipping_day_btn);
+        timeSelector = findViewById(R.id.new_shipping_time_btn);
+        dayLabel = findViewById(R.id.new_shipping_day_text);
+        timeLabel = findViewById(R.id.new_shipping_time_text);
 
         checksGroupsMercadona = findViewById(R.id.new_shipping_mercadona_groups);
         checksGroupsEstanco = findViewById(R.id.new_shipping_estanco_groups);
@@ -109,6 +124,8 @@ public class NewShippingActivity extends AppCompatActivity {
     public void initializeParameters() {
         productRepository = new ProductRepository();
         shippingRepository = new ShippingRepository();
+        
+        dateSelected = Calendar.getInstance();
 
         shipping = null;
         try {
@@ -175,6 +192,47 @@ public class NewShippingActivity extends AppCompatActivity {
         }
         else
             selectStore(Store.MERCADONA);
+    }
+
+    public void configureDateSelector() {
+        dayLabel.setText(prettyDayDateFormat.format(dateSelected.getTime()));
+        timeLabel.setText(timeDateFormat.format(dateSelected.getTime()));
+
+        daySelector.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int mYear, mMonth, mDay;
+                mYear = dateSelected.get(Calendar.YEAR);
+                mMonth = dateSelected.get(Calendar.MONTH);
+                mDay = dateSelected.get(Calendar.DAY_OF_MONTH);
+                DatePickerDialog mDatePicker = new DatePickerDialog(NewShippingActivity.this, R.style.AppTheme , new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                        dateSelected.set(year,monthOfYear,dayOfMonth);
+                        dayLabel.setText(prettyDayDateFormat.format(dateSelected.getTime()));
+                    }
+                }, mYear, mMonth, mDay);
+                mDatePicker.show();
+            }
+        });
+
+        timeSelector.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int mHour, mMinute;
+                mHour = dateSelected.get(Calendar.HOUR_OF_DAY);
+                mMinute = dateSelected.get(Calendar.MINUTE);
+                TimePickerDialog mTimePicker = new TimePickerDialog(NewShippingActivity.this, R.style.AppTheme , new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                        dateSelected.set(Calendar.HOUR_OF_DAY,hourOfDay);
+                        dateSelected.set(Calendar.MINUTE,minute);
+                        timeLabel.setText(timeDateFormat.format(dateSelected.getTime()));
+                    }
+                }, mHour, mMinute, true);
+                mTimePicker.show();
+            }
+        });
     }
 
     public void selectStore(Store store) {
@@ -384,6 +442,8 @@ public class NewShippingActivity extends AppCompatActivity {
     public void configureOthers() {
         if (shipping != null)
             othersText.setText(String.format("%.2f", shipping.getTotalPrize()) +" €");
+        else
+            shipping = new Shipping(Store.MERCADONA);
 
         othersText.addTextChangedListener(new TextWatcher() {
             @Override

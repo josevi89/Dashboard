@@ -34,7 +34,7 @@ public class ShippingFragment extends DialogFragment {
         shipping = getArguments().getParcelable(SHIPPING_FRAGMENT_SHIPPING);
 
         productList = rootView.findViewById(R.id.products_shipping_list);
-        productNewShippingListAdapter = new ProductNewShippingListAdapter(shipping.getProducts(), activity);
+        productNewShippingListAdapter = new ProductNewShippingListAdapter(shipping, activity);
         productList.setLayoutManager(new LinearLayoutManager(activity));
         productList.setAdapter(productNewShippingListAdapter);
 
