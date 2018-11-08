@@ -3,6 +3,7 @@ package com.josevi.gastos.activities;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.os.Bundle;
+import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -22,9 +23,9 @@ import com.josevi.gastos.models.Notification;
 import com.josevi.gastos.models.enums.NotificationTag;
 import com.josevi.gastos.repositories.NotificationRepository;
 
+import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 import static com.josevi.gastos.utils.Constantes.NOTIFICATION_EDIT;
 import static com.josevi.gastos.utils.Constantes.timeDateFormat;
@@ -45,7 +46,7 @@ public class NewNotificationActivity extends AppCompatActivity {
     private NotificationRepository notificationRepository;
     private Calendar dateSelected;
     private Notification notificationToUpdate;
-    private Map<String, String> infoMap;
+    private List<Pair<String, String>> infoList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,10 +90,10 @@ public class NewNotificationActivity extends AppCompatActivity {
     private void initializeParameters() {
         notificationRepository = new NotificationRepository();
         dateSelected = Calendar.getInstance();
-        infoMap = new HashMap<String, String>();
+        infoList = new ArrayList<Pair<String, String>>();
         if (notificationToUpdate != null) {
             dateSelected.setTime(notificationToUpdate.getDate());
-            infoMap = notificationToUpdate.getInfoMap();
+            infoList = notificationToUpdate.getInfoList();
         }
     }
 
@@ -145,7 +146,7 @@ public class NewNotificationActivity extends AppCompatActivity {
     }
 
     public void configureAddNewInfo() {
-        notificationInfoListAdatper = new NotificationInfoListAdapter(infoMap, this);
+        notificationInfoListAdatper = new NotificationInfoListAdapter(infoList, this);
         notificationInfoListAdatper.notifyDataSetChanged();
         infoView.setLayoutManager(new LinearLayoutManager(this));
         infoView.setAdapter(notificationInfoListAdatper);
@@ -155,8 +156,8 @@ public class NewNotificationActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if (newInfoKey.getText() != null && !newInfoKey.getText().toString().isEmpty()
                         && newInfoInfo.getText() != null && !newInfoInfo.getText().toString().isEmpty()) {
-                    infoMap.put(newInfoKey.getText().toString(), newInfoInfo.getText().toString());
-                    notificationInfoListAdatper.setNotificationInfos(infoMap);
+                    infoList.add(new Pair(newInfoKey.getText().toString(), newInfoInfo.getText().toString()));
+                    notificationInfoListAdatper.setNotificationInfos(infoList);
                     newInfoKey.setText("");
                     newInfoInfo.setText("");
                 }
@@ -173,7 +174,7 @@ public class NewNotificationActivity extends AppCompatActivity {
                         notificationRepository.update(notificationToUpdate);
                     else {
                         Notification newNotification = new Notification(dateSelected.getTime(), title.getText().toString(), NotificationTag.EVENT);
-                        newNotification.setInfoMap(infoMap);
+                        newNotification.setInfoList(infoList);
                         notificationRepository.save(newNotification);
                     }
                 }
@@ -188,7 +189,7 @@ public class NewNotificationActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if (!title.getText().toString().isEmpty() || !infoMap.isEmpty()) {
+        if (!title.getText().toString().isEmpty() || !infoList.isEmpty()) {
             TwoButtonsDialog exitDialog = new TwoButtonsDialog(this, R.color.red_app);
             exitDialog.setMessage("Si sales, se perderán los cambios.");
             exitDialog.setLeftButtonListener(new View.OnClickListener() {

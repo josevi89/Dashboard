@@ -45,7 +45,7 @@
             <TextView
                 android:layout_width="180dp"
                 android:layout_height="wrap_content"
-                android:id="@+id/shipping_title"
+                android:id="@+id/shipping_date"
                 android:text="dd MMM HH:mm"
                 android:textColor="@color/red_app"/>
 
@@ -94,7 +94,7 @@
         android:layout_height="50dp"
         android:id="@+id/shipping_no_info_cover"
         android:text="No hay información adicional"
-        android:layout_below="@id/shipping_info_view"
+        android:layout_below="@id/shipping_shipping_view"
         android:visibility="gone"/>
 
 </RelativeLayout>

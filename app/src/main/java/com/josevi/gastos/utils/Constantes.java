@@ -20,6 +20,7 @@ public class Constantes {
     //ShippingsActivity
     public static String SHIPPING_FRAGMENT_SHIPPING = "SHIPPING_FRAGMENT_SHIPPING";
     public static String SHIPPING_FRAGMENT_TAG = "SHIPPING_FRAGMENT_TAG";
+    public static String SHIPPING_EDIT = "SHIPPING_EDIT";
 
     //NotificationsActivity
     public static String NOTIFICATION_EDIT = "NOTIFICATION_EDIT";

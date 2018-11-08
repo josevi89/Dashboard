@@ -14,21 +14,26 @@ import android.widget.TextView;
 import com.josevi.gastos.R;
 import com.josevi.gastos.activities.NewShippingActivity;
 import com.josevi.gastos.models.Product;
+import com.josevi.gastos.models.Shipping;
+import com.josevi.gastos.repositories.ProductRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ProductNewShippingListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    List<Product> products;
+    Shipping shipping;
     Activity activity;
+    ProductRepository productRepository;
 
-    public ProductNewShippingListAdapter(List<Product> products, Activity activity) {
-        this.products = products;
+    public ProductNewShippingListAdapter(Shipping shipping, Activity activity) {
+        this.shipping = shipping;
         this.activity = activity;
+        this.productRepository = new ProductRepository();
     }
 
-    public void setProducts(List<Product> products) {
-        this.products = products;
+    public void setShipping(Shipping shipping) {
+        this.shipping = shipping;
         notifyDataSetChanged();
     }
 
@@ -42,12 +47,12 @@ public class ProductNewShippingListAdapter extends RecyclerView.Adapter<Recycler
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         final ProductViewHolder productViewHolder = (ProductViewHolder) holder;
-        final Product product = products.get(position);
-
+        String productCode = new ArrayList<String>(shipping.keySet()).get(position);
+        final Product product = productRepository.findProductByCode(productCode);
         productViewHolder.name.setText(product.getName());
-        Double prize = ((NewShippingActivity)activity).getPrizeSettedFromProductCode(product.getCode());
-        if (prize == null)
-            prize = product.getPrize();
+
+        Double prize = shipping.get(productCode).second != null && shipping.get(productCode).second > 1 ?
+                shipping.get(productCode).second : null;
         if (prize != null && prize.doubleValue() != -1) {
             productViewHolder.prize.setText(String.format(String.format("%.2f", prize)) + " €");
             productViewHolder.setNewPrizeContainer.setVisibility(View.GONE);
@@ -57,7 +62,7 @@ public class ProductNewShippingListAdapter extends RecyclerView.Adapter<Recycler
             productViewHolder.setNewPrizeContainer.setVisibility(View.VISIBLE);
             productViewHolder.setQtyContainer.setVisibility(View.GONE);
         }
-        int qty = ((NewShippingActivity)activity).getQtyFromProductCode(product.getCode());
+        int qty = shipping.get(productCode).first;
         productViewHolder.qty.setText(String.valueOf(qty));
         if (qty > 0) {
             productViewHolder.minusBtn.setVisibility(View.VISIBLE);
@@ -132,12 +137,11 @@ public class ProductNewShippingListAdapter extends RecyclerView.Adapter<Recycler
                 }
             }
         });
-
     }
 
     @Override
     public int getItemCount() {
-        return products.size();
+        return shipping.size();
     }
 
     public static class ProductViewHolder extends RecyclerView.ViewHolder {
@@ -163,5 +167,4 @@ public class ProductNewShippingListAdapter extends RecyclerView.Adapter<Recycler
             plusBtn = v.findViewById(R.id.plus_button);
         }
     }
-
 }

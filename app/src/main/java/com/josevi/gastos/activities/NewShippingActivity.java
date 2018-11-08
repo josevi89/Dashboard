@@ -6,7 +6,6 @@ import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -32,6 +31,7 @@ import com.josevi.gastos.repositories.ShippingRepository;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.josevi.gastos.utils.Constantes.SHIPPING_EDIT;
 import static com.josevi.gastos.utils.Constantes.SHIPPING_FRAGMENT_SHIPPING;
 import static com.josevi.gastos.utils.Constantes.SHIPPING_FRAGMENT_TAG;
 
@@ -59,13 +59,20 @@ public class NewShippingActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_new_cost);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+//        setSupportActionBar(toolbar);
 
-        productRepository = new ProductRepository();
-        shippingRepository = new ShippingRepository();
-        productNewShippingListAdapter = new ProductNewShippingListAdapter(new ArrayList<Product>(), this);
+        initializeLayout();
+        initializeParameters();
+        configureHeader();
+        configureGroupCheckBox();
+        configureFindAndAddProducts();
+        configureOthers();
+        configureButtons();
+    }
+
+    public void initializeLayout() {
+        setContentView(R.layout.activity_new_cost);
 
         selectorMercadona = findViewById(R.id.new_shipping_mercadona_selector);
         selectorEstanco = findViewById(R.id.new_shipping_estanco_selector);
@@ -97,9 +104,23 @@ public class NewShippingActivity extends AppCompatActivity {
         viewShipping.setEnabled(false);
         saveShipping = findViewById(R.id.new_shipping_save_shipping);
         saveShipping.setEnabled(false);
+    }
 
-        selectStore(Store.MERCADONA);
+    public void initializeParameters() {
+        productRepository = new ProductRepository();
+        shippingRepository = new ShippingRepository();
 
+        shipping = null;
+        try {
+            shipping = getIntent().getParcelableExtra(SHIPPING_EDIT);
+            productNewShippingListAdapter = new ProductNewShippingListAdapter(shipping, this);
+        }
+        catch (Exception e) {}
+        if (shipping == null)
+            productNewShippingListAdapter = new ProductNewShippingListAdapter(new Shipping(Store.MERCADONA), this);
+    }
+
+    public void configureHeader() {
         selectorMercadona.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -148,6 +169,40 @@ public class NewShippingActivity extends AppCompatActivity {
             }
         });
 
+        if (shipping != null) {
+            selectStore(shipping.getStore());
+            totalText.setText(String.format("%.2f", shipping.getTotalPrize()) +" €");
+        }
+        else
+            selectStore(Store.MERCADONA);
+    }
+
+    public void selectStore(Store store) {
+        storeSelected = store;
+        uncheckAllGroups();
+        findProduct.setText("");
+        switch (store) {
+            case MERCADONA:
+                selectorMercadona.setImageDrawable(getResources().getDrawable(R.mipmap.logo_mercadona));
+                selectorEstanco.setImageDrawable(getResources().getDrawable(R.mipmap.logo_estanco_bn));
+                checksGroupsMercadona.setVisibility(View.VISIBLE);
+                checksGroupsEstanco.setVisibility(View.GONE);
+                break;
+            case ESTANCO:
+                selectorMercadona.setImageDrawable(getResources().getDrawable(R.mipmap.logo_mercadona_bn));
+                selectorEstanco.setImageDrawable(getResources().getDrawable(R.mipmap.logo_estanco));
+                checksGroupsMercadona.setVisibility(View.GONE);
+                checksGroupsEstanco.setVisibility(View.VISIBLE);
+                break;
+        }
+        productsFinded = new ArrayList<Product>();
+        shipping = new Shipping(store);
+        saveShipping.setEnabled(false);
+        viewShipping.setEnabled(false);
+        reloadTotal();
+    }
+
+    public void configureGroupCheckBox() {
         checkMeat.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
@@ -301,7 +356,9 @@ public class NewShippingActivity extends AppCompatActivity {
                 reloadProductsFinded();
             }
         });
+    }
 
+    public void configureFindAndAddProducts() {
         findProduct.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -318,6 +375,15 @@ public class NewShippingActivity extends AppCompatActivity {
 
             }
         });
+
+        listProductsFinded.setLayoutManager(new LinearLayoutManager(this));
+        listProductsFinded.setAdapter(productNewShippingListAdapter);
+        productNewShippingListAdapter.notifyDataSetChanged();
+    }
+
+    public void configureOthers() {
+        if (shipping != null)
+            othersText.setText(String.format("%.2f", shipping.getTotalPrize()) +" €");
 
         othersText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -341,26 +407,9 @@ public class NewShippingActivity extends AppCompatActivity {
 
             }
         });
+    }
 
-        listProductsFinded.setLayoutManager(new LinearLayoutManager(this));
-        listProductsFinded.setAdapter(productNewShippingListAdapter);
-
-//        listProductsFinded.addOnScrollListener(new EndlessRecyclerViewScrollListener(mLayoutManager) {
-//            @Override
-//            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
-//                Log.d("OnLoadMor", "LoadMore");
-//                view.post(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        onClickLoadMore();
-//                    }
-//                });
-//
-//            }
-//        });
-
-        productNewShippingListAdapter.notifyDataSetChanged();
-
+    public void configureButtons() {
         viewShipping.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -385,43 +434,11 @@ public class NewShippingActivity extends AppCompatActivity {
         });
     }
 
-    public void selectStore(Store store) {
-        storeSelected = store;
-        uncheckAllGroups();
-        findProduct.setText("");
-        switch (store) {
-            case MERCADONA:
-                selectorMercadona.setImageDrawable(getResources().getDrawable(R.mipmap.logo_mercadona));
-                selectorEstanco.setImageDrawable(getResources().getDrawable(R.mipmap.logo_estanco_bn));
-                checksGroupsMercadona.setVisibility(View.VISIBLE);
-                checksGroupsEstanco.setVisibility(View.GONE);
-                break;
-            case ESTANCO:
-                selectorMercadona.setImageDrawable(getResources().getDrawable(R.mipmap.logo_mercadona_bn));
-                selectorEstanco.setImageDrawable(getResources().getDrawable(R.mipmap.logo_estanco));
-                checksGroupsMercadona.setVisibility(View.GONE);
-                checksGroupsEstanco.setVisibility(View.VISIBLE);
-                break;
-        }
-        productsFinded = new ArrayList<Product>();
-        shipping = new Shipping(store);
-        saveShipping.setEnabled(false);
-        viewShipping.setEnabled(false);
+    public void addProductToShipping(String code) {
+        shipping.addProduct(code);
+        viewShipping.setEnabled(true);
+        saveShipping.setEnabled(true);
         reloadTotal();
-    }
-
-    public int getQtyFromProductCode(String code) {
-        if (shipping.containsKey(code))
-            return shipping.get(code).first;
-        else
-            return 0;
-    }
-
-    public Double getPrizeSettedFromProductCode(String code) {
-        if (shipping.containsKey(code))
-            return shipping.get(code).second;
-        else
-            return null;
     }
 
     public void setPrizeToProduct(String code, double prize) {
@@ -429,13 +446,6 @@ public class NewShippingActivity extends AppCompatActivity {
             shipping.put(code, new Pair(shipping.get(code).first, prize));
         else
             shipping.put(code, new Pair(1, prize));
-        viewShipping.setEnabled(true);
-        saveShipping.setEnabled(true);
-        reloadTotal();
-    }
-
-    public void addProductToShipping(String code) {
-        shipping.addProduct(code);
         viewShipping.setEnabled(true);
         saveShipping.setEnabled(true);
         reloadTotal();
@@ -464,7 +474,7 @@ public class NewShippingActivity extends AppCompatActivity {
         }
         else
             productsFinded = new ArrayList<Product>();
-        productNewShippingListAdapter.setProducts(productsFinded);
+        productNewShippingListAdapter.setShipping(shipping);
     }
 
     public void uncheckAllGroups() {

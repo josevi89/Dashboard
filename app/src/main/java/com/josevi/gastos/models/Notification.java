@@ -3,14 +3,15 @@ package com.josevi.gastos.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.support.v4.util.Pair;
 
 import com.josevi.gastos.models.enums.NotificationTag;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 import static com.josevi.gastos.utils.Constantes.shortDateFormat;
 
@@ -19,7 +20,7 @@ public class Notification implements Comparable<Notification>, Parcelable{
     Date date;
     String title;
     NotificationTag tag;
-    Map<String, String> infoMap;
+    List<Pair<String, String>> infoList;
 
     public Notification(Date date, String title, NotificationTag tag) {
         this.date = date;
@@ -36,11 +37,11 @@ public class Notification implements Comparable<Notification>, Parcelable{
         }
         title = in.readString();
         tag = NotificationTag.values()[in.readInt()];
-        infoMap = new HashMap<String, String>();
+        infoList = new ArrayList<Pair<String, String>>();
         int N = in.readInt();
         if (N > 0)
             for (int n = 0; n < N; n++)
-                infoMap.put(in.readString(), in.readString());
+                infoList.add(new Pair(in.readString(), in.readString()));
     }
 
     public static final Creator<Notification> CREATOR = new Creator<Notification>() {
@@ -98,12 +99,12 @@ public class Notification implements Comparable<Notification>, Parcelable{
         this.tag = tag;
     }
 
-    public Map<String, String> getInfoMap() {
-        return infoMap;
+    public List<Pair<String, String>> getInfoList() {
+        return infoList;
     }
 
-    public void setInfoMap(Map<String, String> infoMap) {
-        this.infoMap = infoMap;
+    public void setInfoList(List<Pair<String, String>> infoList) {
+        this.infoList = infoList;
     }
 
     @Override
@@ -134,12 +135,13 @@ public class Notification implements Comparable<Notification>, Parcelable{
         parcel.writeString(shortDateFormat.format(date));
         parcel.writeString(title);
         parcel.writeInt(tag.ordinal());
-        if (infoMap == null || infoMap.isEmpty())
+        if (infoList == null || infoList.isEmpty())
             parcel.writeInt(0);
         else {
-            for (String key: infoMap.keySet()) {
-                parcel.writeString(key);
-                parcel.writeString(infoMap.get(key));
+            parcel.writeInt(infoList.size());
+            for (Pair<String, String> info: infoList) {
+                parcel.writeString(info.first);
+                parcel.writeString(info.second);
             }
         }
     }

@@ -203,7 +203,6 @@ public class NotificationsActivity extends AppCompatActivity {
 
     public void setDeleteButtonVisibility(boolean visible) {
         deleteBtn.setVisibility(visible ? View.VISIBLE : View.GONE);
-        ((NotificationListAdapter)listListView.getAdapter()).setHideEditButtons(visible);
     }
 
     @Override

@@ -120,6 +120,15 @@ public class Shipping implements Parcelable, Comparable<Shipping>, Map<String, P
         generateId();
     }
 
+    public String getCode() {
+        String code = store.toString();
+        while (code.length() < 3)
+            code += "_";
+        code = code.substring(0, 3).toUpperCase();
+        code += shortDateFormat.format(date);
+        return code;
+    }
+
     public String getShippingFormated() {
         String shippingFormatted = "";
         for(String productBought: shipping.keySet())

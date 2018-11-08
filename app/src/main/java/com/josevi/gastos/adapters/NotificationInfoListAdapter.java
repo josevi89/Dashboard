@@ -2,6 +2,7 @@ package com.josevi.gastos.adapters;
 
 import android.app.Activity;
 import android.support.annotation.NonNull;
+import android.support.v4.util.Pair;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,15 +17,15 @@ import java.util.Map;
 
 public class NotificationInfoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    Map<String, String> notificationInfos;
+    List<Pair<String, String>> notificationInfos;
     Activity activity;
 
-    public NotificationInfoListAdapter(Map<String, String> notificationInfos, Activity activity) {
+    public NotificationInfoListAdapter(List<Pair<String, String>> notificationInfos, Activity activity) {
         this.notificationInfos = notificationInfos;
         this.activity = activity;
     }
 
-    public void setNotificationInfos(Map<String, String> notificationInfos) {
+    public void setNotificationInfos(List<Pair<String, String>> notificationInfos) {
         this.notificationInfos = notificationInfos;
     }
 
@@ -39,11 +40,8 @@ public class NotificationInfoListAdapter extends RecyclerView.Adapter<RecyclerVi
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         final NotificationInfoViewHolder notificationInfoViewHolder = (NotificationInfoViewHolder) holder;
 
-        List<String> keys = new ArrayList<String>(notificationInfos.keySet());
-        Collections.sort(keys);
-
-        notificationInfoViewHolder.key.setText(keys.get(position));
-        notificationInfoViewHolder.info.setText(notificationInfos.get(keys.get(position)));
+        notificationInfoViewHolder.key.setText(notificationInfos.get(position).first);
+        notificationInfoViewHolder.info.setText(notificationInfos.get(position).second);
     }
 
     @Override

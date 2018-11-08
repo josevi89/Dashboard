@@ -2,8 +2,8 @@ package com.josevi.gastos.adapters;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,8 +15,6 @@ import com.josevi.gastos.R;
 import com.josevi.gastos.activities.NewNotificationActivity;
 import com.josevi.gastos.activities.NotificationsActivity;
 import com.josevi.gastos.models.Notification;
-
-import org.apache.poi.hssf.util.HSSFColor;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -31,18 +29,10 @@ public class NotificationListAdapter extends RecyclerView.Adapter<RecyclerView.V
     Activity activity;
     List<String> notificationsToDelete;
 
-    boolean hideEditButtons;
-
     public NotificationListAdapter(List<Notification> notifications, Activity activity) {
         this.notifications = notifications;
         this.activity = activity;
         notificationsToDelete = new ArrayList<String>();
-        hideEditButtons = false;
-    }
-
-    public void setHideEditButtons(boolean hideEditButtons) {
-        this.hideEditButtons = hideEditButtons;
-        notifyDataSetChanged();
     }
 
     @NonNull
@@ -69,9 +59,8 @@ public class NotificationListAdapter extends RecyclerView.Adapter<RecyclerView.V
         notificationViewHolder.time.setText(timeDateFormat.format(notification.getDate()));
         notificationViewHolder.title.setText(notification.getTitle());
 
-        if (!hideEditButtons) {
-            notificationViewHolder.editBtn.setVisibility(hideEditButtons ? View.GONE : View.VISIBLE);
-        }
+        notificationViewHolder.infoView.setLayoutManager(new LinearLayoutManager(activity));
+        notificationViewHolder.infoView.setAdapter(new NotificationInfoListAdapter(notification.getInfoList(), activity));
 
         notificationViewHolder.editBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -111,7 +100,7 @@ public class NotificationListAdapter extends RecyclerView.Adapter<RecyclerView.V
                         notificationViewHolder.noInfoCover.setVisibility(View.GONE);
                     }
                     else {
-                        if (notification.getInfoMap().isEmpty())
+                        if (notification.getInfoList().isEmpty())
                             notificationViewHolder.noInfoCover.setVisibility(View.VISIBLE);
                         else
                             notificationViewHolder.infoView.setVisibility(View.VISIBLE);
@@ -129,8 +118,8 @@ public class NotificationListAdapter extends RecyclerView.Adapter<RecyclerView.V
         holder.title.setTextColor(activity.getResources().getColor(R.color.white));
         holder.date.setTextColor(activity.getResources().getColor(R.color.white));
         holder.time.setTextColor(activity.getResources().getColor(R.color.white));
+        holder.editBtn.setEnabled(false);
         ((NotificationsActivity)activity).setDeleteButtonVisibility(true);
-        setHideEditButtons(true);
     }
 
     public void unmarkEventToDelete(NotificationViewHolder holder, String code) {
@@ -141,6 +130,7 @@ public class NotificationListAdapter extends RecyclerView.Adapter<RecyclerView.V
         holder.title.setTextColor(activity.getResources().getColor(R.color.blue_app));
         holder.date.setTextColor(activity.getResources().getColor(R.color.black));
         holder.time.setTextColor(activity.getResources().getColor(R.color.black));
+        holder.editBtn.setEnabled(true);
         if (notificationsToDelete.isEmpty())
             ((NotificationsActivity)activity).setDeleteButtonVisibility(false);
     }

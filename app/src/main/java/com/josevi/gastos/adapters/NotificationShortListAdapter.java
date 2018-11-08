@@ -73,5 +73,4 @@ public class NotificationShortListAdapter extends RecyclerView.Adapter<RecyclerV
             this.date = v.findViewById(R.id.notification_short_date);
         }
     }
-
 }
