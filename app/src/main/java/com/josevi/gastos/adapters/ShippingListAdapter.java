@@ -2,6 +2,7 @@ package com.josevi.gastos.adapters;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -72,6 +73,7 @@ public class ShippingListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
         shippingViewHolder.shippingView.setLayoutManager(new LinearLayoutManager(activity));
         shippingViewHolder.shippingView.setAdapter(new ProductListAdapter(shipping, activity));
+        shippingViewHolder.shippingView.setVisibility(View.GONE);
 
         shippingViewHolder.editBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -105,9 +107,14 @@ public class ShippingListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                         markEventToDelete(shippingViewHolder, shipping.getCode(), shipping.getStore());
                 }
                 else {
-                    shippingViewHolder.shippingView.setVisibility(
-                            shippingViewHolder.shippingView.getVisibility() == View.VISIBLE ?
-                                    View.GONE : View.VISIBLE);
+                    if (shippingViewHolder.shippingView.getVisibility() == View.VISIBLE) {
+                        shippingViewHolder.shippingView.setVisibility(View.GONE);
+                        shippingViewHolder.total.setText(String.format("%.2f", shipping.getTotalPrize()) + " €");
+                    }
+                    else {
+                        shippingViewHolder.shippingView.setVisibility(View.VISIBLE);
+                        shippingViewHolder.total.setText("Total: " +String.format("%.2f", shipping.getTotalPrize()) + " €");
+                    }
                 }
             }
         });

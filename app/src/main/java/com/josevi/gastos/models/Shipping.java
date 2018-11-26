@@ -26,10 +26,10 @@ import static com.josevi.gastos.utils.Constantes.dateFormat;
 import static com.josevi.gastos.utils.Constantes.dayDateFormat;
 import static com.josevi.gastos.utils.Constantes.shortDateFormat;
 
-public class Shipping implements Parcelable, Comparable<Shipping>, Map<String, Pair<Integer, Double>>{
+public class Shipping implements Parcelable, Comparable<Shipping>{
 
     private String id;
-    private Map<String, Pair<Integer, Double>> shipping;
+    private Map<String, ShippingQty> shipping;
     private Store store;
     private Date date;
     private double others;
@@ -39,14 +39,15 @@ public class Shipping implements Parcelable, Comparable<Shipping>, Map<String, P
     private ProductRepository productRepository;
 
     public Shipping(Store store) {
-        shipping = new HashMap<String, Pair<Integer, Double>>();
+        shipping = new HashMap<String, ShippingQty>();
         date = Calendar.getInstance().getTime();
         others = 0;
         productRepository = new ProductRepository();
         this.store = store;
+        generateId();
     }
 
-    public Shipping(Map<String, Pair<Integer, Double>> shipping, Store store, double others) {
+    public Shipping(Map<String, ShippingQty> shipping, Store store, double others) {
         this.shipping = shipping;
         productRepository = new ProductRepository();
         date = Calendar.getInstance().getTime();
@@ -133,36 +134,37 @@ public class Shipping implements Parcelable, Comparable<Shipping>, Map<String, P
         String shippingFormatted = "";
         for(String productBought: shipping.keySet())
             shippingFormatted += productBought +","
-                    +String.valueOf(shipping.get(productBought).first) +","
-                    +(shipping.get(productBought).second != null ?
-                    String.format("%.2f", shipping.get(productBought).second) : -1) +"-";
+                    +String.valueOf(shipping.get(productBought).qty) +","
+                    +(shipping.get(productBought).prize != -1 ?
+                    String.format("%.2f", shipping.get(productBought).prize) : -1) +"-";
         return shippingFormatted.substring(0, shippingFormatted.length() - 1);
     }
 
     public void setShippingParsed(String shipping) {
-        Map<String, Pair<Integer, Double>> shippingParsed = new HashMap<String, Pair<Integer, Double>>();
+        Map<String, ShippingQty> shippingParsed = new HashMap<String, ShippingQty>();
         for(String productBought: shipping.split("-")) {
             Double prize = Double.parseDouble(productBought.split(",")[2]);
             if (prize == -1)
                 prize = null;
             shippingParsed.put(productBought.split(",")[0],
-                    new Pair(Integer.parseInt(productBought.split(",")[1]), prize));
+                    new ShippingQty(Integer.parseInt(productBought.split(",")[1]), prize));
         }
         this.shipping = shippingParsed;
     }
 
-    public void addProduct(String code) {
-        if (shipping.containsKey(code))
-            shipping.put(code, new Pair(shipping.get(code).first + 1, shipping.get(code).second));
+    public void addProduct(Product product) {
+        if (shipping.containsKey(product.getCode()))
+            shipping.put(product.getCode(), new ShippingQty(
+                    shipping.get(product.getCode()).qty + 1, shipping.get(product.getCode()).prize));
         else {
-            shipping.put(code, new Pair(1, null));
+            shipping.put(product.getCode(), new ShippingQty(1, product.getPrize()));
         }
     }
 
     public void deleteProduct(String code) {
         if (shipping.containsKey(code)) {
-            if (shipping.get(code).first > 1)
-                shipping.put(code, new Pair(shipping.get(code).first - 1, shipping.get(code).second));
+            if (shipping.get(code).qty > 1)
+                shipping.put(code, new ShippingQty(shipping.get(code).qty - 1, shipping.get(code).prize));
             else {
                 shipping.remove(code);
             }
@@ -174,8 +176,8 @@ public class Shipping implements Parcelable, Comparable<Shipping>, Map<String, P
         double total = others;
         for (String code: shipping.keySet()) {
             Product product = productRepository.findProductByCode(code);
-            total += shipping.get(code).first *
-                    (shipping.get(code).second != null ? shipping.get(code).second : product.getPrize());
+            total += shipping.get(code).qty *
+                    (shipping.get(code).prize != -1 ? shipping.get(code).prize : product.getPrize());
         }
 
         return total;
@@ -209,13 +211,14 @@ public class Shipping implements Parcelable, Comparable<Shipping>, Map<String, P
     @Override
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeString(shortDateFormat.format(date));
+        parcel.writeInt(store.ordinal());
         if (shipping.isEmpty())
             parcel.writeInt(0);
         else {
             parcel.writeInt(shipping.size());
             for (String code: shipping.keySet()) {
-                parcel.writeInt(shipping.get(code).first);
-                parcel.writeDouble(shipping.get(code).second != null ? shipping.get(code).second : -1);
+                parcel.writeInt(shipping.get(code).qty);
+                parcel.writeDouble(shipping.get(code).prize);
                 parcel.writeString(code);
             }
         }
@@ -223,22 +226,22 @@ public class Shipping implements Parcelable, Comparable<Shipping>, Map<String, P
     }
 
     public Shipping (Parcel in) {
+        this.productRepository = new ProductRepository();
         try {
             this.date = shortDateFormat.parse(in.readString());
         }
         catch (ParseException pe) {
             this.date = Calendar.getInstance().getTime();
         }
-        this.shipping = new HashMap<String, Pair<Integer, Double>>();
+        this.store = Store.values()[in.readInt()];
+        this.shipping = new HashMap<String, ShippingQty>();
         int N = in.readInt();
         if (N != 0) {
             for (int n = 0; n < N; n++) {
-                Integer qty = in.readInt();
-                Double prize = in.readDouble();
-                if (prize == -1)
-                    prize = null;
+                int qty = in.readInt();
+                double prize = in.readDouble();
                 this.shipping.put(in.readString(),
-                        new Pair(qty, prize));
+                        new ShippingQty(qty, prize));
             }
         }
         this.others = in.readDouble();
@@ -265,68 +268,56 @@ public class Shipping implements Parcelable, Comparable<Shipping>, Map<String, P
             return -1;
     }
 
-    @Override
     public int size() {
         return shipping.size();
     }
 
-    @Override
     public boolean isEmpty() {
         if (shipping == null)
-            shipping = new HashMap<String, Pair<Integer, Double>>();
+            shipping = new HashMap<String, ShippingQty>();
         return shipping.isEmpty();
     }
 
-    @Override
     public boolean containsKey(Object o) {
         return shipping.containsKey(o);
     }
 
-    @Override
     public boolean containsValue(Object o) {
         return shipping.containsValue(o);
     }
 
-    @Override
-    public Pair<Integer, Double> get(Object o) {
+    public ShippingQty get(Object o) {
         return shipping.get(o);
     }
 
-    @Override
-    public Pair<Integer, Double> put(String s, Pair<Integer, Double> integerDoublePair) {
+    public ShippingQty put(String s, ShippingQty integerDoublePair) {
         return shipping.put(s, integerDoublePair);
     }
 
-    @Override
-    public Pair<Integer, Double> remove(Object o) {
+    public ShippingQty remove(Object o) {
         return shipping.remove(o);
     }
 
-    @Override
-    public void putAll(@NonNull Map<? extends String, ? extends Pair<Integer, Double>> map) {
+    public void putAll(@NonNull Map<? extends String, ? extends ShippingQty> map) {
         shipping.putAll(map);
     }
 
-    @Override
     public void clear() {
         shipping.clear();
     }
 
     @NonNull
-    @Override
     public Set<String> keySet() {
         return shipping.keySet();
     }
 
     @NonNull
-    @Override
-    public Collection<Pair<Integer, Double>> values() {
+    public Collection<ShippingQty> values() {
         return shipping.values();
     }
 
     @NonNull
-    @Override
-    public Set<Entry<String, Pair<Integer, Double>>> entrySet() {
+    public Set<Map.Entry<String, ShippingQty>> entrySet() {
         return shipping.entrySet();
     }
 }

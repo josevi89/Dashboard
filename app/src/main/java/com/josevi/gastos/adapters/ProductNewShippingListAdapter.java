@@ -23,17 +23,20 @@ import java.util.List;
 public class ProductNewShippingListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     Shipping shipping;
+    List<Product> products;
     Activity activity;
     ProductRepository productRepository;
 
-    public ProductNewShippingListAdapter(Shipping shipping, Activity activity) {
+    public ProductNewShippingListAdapter(Shipping shipping, List<Product> products, Activity activity) {
         this.shipping = shipping;
+        this.products = products != null ? products : shipping.getProducts();
         this.activity = activity;
         this.productRepository = new ProductRepository();
     }
 
-    public void setShipping(Shipping shipping) {
+    public void setProducts(Shipping shipping, List<Product> products) {
         this.shipping = shipping;
+        this.products = products != null ? products : shipping.getProducts();
         notifyDataSetChanged();
     }
 
@@ -47,13 +50,15 @@ public class ProductNewShippingListAdapter extends RecyclerView.Adapter<Recycler
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         final ProductViewHolder productViewHolder = (ProductViewHolder) holder;
-        String productCode = new ArrayList<String>(shipping.keySet()).get(position);
-        final Product product = productRepository.findProductByCode(productCode);
+        final Product product = products.get(position);
+        String productCode = product.getCode();
+
         productViewHolder.name.setText(product.getName());
 
-        Double prize = shipping.get(productCode).second != null && shipping.get(productCode).second > 1 ?
-                shipping.get(productCode).second : null;
-        if (prize != null && prize.doubleValue() != -1) {
+        double prize = shipping.containsKey(productCode) ?
+                shipping.get(productCode).prize : product.getPrize();
+
+        if (prize != -1) {
             productViewHolder.prize.setText(String.format(String.format("%.2f", prize)) + " €");
             productViewHolder.setNewPrizeContainer.setVisibility(View.GONE);
             productViewHolder.setQtyContainer.setVisibility(View.VISIBLE);
@@ -62,7 +67,7 @@ public class ProductNewShippingListAdapter extends RecyclerView.Adapter<Recycler
             productViewHolder.setNewPrizeContainer.setVisibility(View.VISIBLE);
             productViewHolder.setQtyContainer.setVisibility(View.GONE);
         }
-        int qty = shipping.get(productCode).first;
+        int qty = shipping.containsKey(productCode) ? shipping.get(productCode).qty : 0;
         productViewHolder.qty.setText(String.valueOf(qty));
         if (qty > 0) {
             productViewHolder.minusBtn.setVisibility(View.VISIBLE);
@@ -76,7 +81,7 @@ public class ProductNewShippingListAdapter extends RecyclerView.Adapter<Recycler
         productViewHolder.plusBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ((NewShippingActivity)activity).addProductToShipping(product.getCode());
+                ((NewShippingActivity)activity).addProductToShipping(product);
                 productViewHolder.qty.setText(String.valueOf(Integer.parseInt(productViewHolder.qty.getText().toString()) + 1));
                 productViewHolder.minusBtn.setVisibility(View.VISIBLE);
                 productViewHolder.layout.setBackgroundColor(activity.getResources().getColor(R.color.red_app_light));
@@ -141,7 +146,7 @@ public class ProductNewShippingListAdapter extends RecyclerView.Adapter<Recycler
 
     @Override
     public int getItemCount() {
-        return shipping.size();
+        return products.size();
     }
 
     public static class ProductViewHolder extends RecyclerView.ViewHolder {

@@ -22,6 +22,7 @@ import com.prolificinteractive.materialcalendarview.DayViewDecorator;
 import com.prolificinteractive.materialcalendarview.DayViewFacade;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
+import com.prolificinteractive.materialcalendarview.OnMonthChangedListener;
 import com.prolificinteractive.materialcalendarview.spans.DotSpan;
 
 import java.util.Calendar;
@@ -146,12 +147,22 @@ public class NotificationsActivity extends AppCompatActivity {
             public void onDateSelected(@NonNull MaterialCalendarView widget, @NonNull CalendarDay date, boolean selected) {
                 dateSelected = date.getCalendar();
                 calendarListView.setAdapter(new NotificationShortListAdapter(notificationRepository.getNotificationsInDay(dateSelected), NotificationsActivity.this));
+                calendar.removeDecorators();
+                calendar.addDecorator(new NotificationsDecorator(notificationRepository.getNotificationDatesInMonth(dateSelected)));
             }
         });
         calendar.setSelectionColor(getResources().getColor(R.color.blue_app));
         calendar.setArrowColor(getResources().getColor(R.color.blue_app));
         calendar.setLeftArrowMask(getResources().getDrawable(R.mipmap.icon_left_arrow_blue));
         calendar.setRightArrowMask(getResources().getDrawable(R.mipmap.icon_right_arrow_blue));
+        calendar.setOnMonthChangedListener(new OnMonthChangedListener() {
+            @Override
+            public void onMonthChanged(MaterialCalendarView widget, CalendarDay date) {
+                dateSelected = date.getCalendar();
+                calendar.removeDecorators();
+                calendar.addDecorator(new NotificationsDecorator(notificationRepository.getNotificationDatesInMonth(dateSelected)));
+            }
+        });
     }
 
     private void configureListTab() {

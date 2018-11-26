@@ -21,6 +21,7 @@ import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.josevi.gastos.R;
 import com.josevi.gastos.activities.NewNotificationActivity;
 import com.josevi.gastos.activities.NotificationsActivity;
+import com.josevi.gastos.activities.ShippingsActivity;
 import com.josevi.gastos.cards.CoreCard;
 import com.josevi.gastos.models.Notification;
 import com.josevi.gastos.models.Shipping;
@@ -99,6 +100,14 @@ public class CoreCardsViewAdapter extends RecyclerView.Adapter<RecyclerView.View
         viewHolderGastos.totalText.setText(String.format("%.2f", total) +" €");
         configureGastosCoreChart(viewHolderGastos.gastosChart);
         setGastosCoreChartData(viewHolderGastos.gastosChart, monthShippings);
+        
+        viewHolderGastos.cardContainer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(activity, ShippingsActivity.class);
+                activity.startActivity(intent);
+            }
+        });
     }
     
     public void configureGastosCoreChart(BarChart chart) {
@@ -220,7 +229,7 @@ public class CoreCardsViewAdapter extends RecyclerView.Adapter<RecyclerView.View
         Calendar now = Calendar.getInstance();
         viewHolderNotifications.todayText.setText(new SimpleDateFormat("dd MMM yyyy").format(now.getTime()));
         List<Notification> notificationsNextWeek = notificationRepository.getNotificationsNextWeek();
-        NotificationListAdapter notificationListAdapter = new NotificationListAdapter(notificationsNextWeek, activity);
+        NotificationShortListAdapter notificationListAdapter = new NotificationShortListAdapter(notificationsNextWeek, activity);
         viewHolderNotifications.notificationsView.setAdapter(notificationListAdapter);
         viewHolderNotifications.notificationsView.setLayoutManager(new LinearLayoutManager(activity));
         viewHolderNotifications.notificationsView.setVisibility(notificationsNextWeek.isEmpty() ? View.GONE : View.VISIBLE);
@@ -250,11 +259,13 @@ public class CoreCardsViewAdapter extends RecyclerView.Adapter<RecyclerView.View
 
     public class ViewHolderGastos extends RecyclerView.ViewHolder {
 
+        private CardView cardContainer;
         private BarChart gastosChart;
         private TextView totalText;
 
         public ViewHolderGastos(View v) {
             super(v);
+            cardContainer = v.findViewById(R.id.core_gastos_card_card_view);
             gastosChart = v.findViewById(R.id.core_gastos_chart);
             totalText = v.findViewById(R.id.core_gastos_card_total_text);
         }

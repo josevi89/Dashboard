@@ -27,6 +27,7 @@ import com.josevi.gastos.dialogs.TwoButtonsDialog;
 import com.josevi.gastos.fragments.ShippingFragment;
 import com.josevi.gastos.models.Product;
 import com.josevi.gastos.models.Shipping;
+import com.josevi.gastos.models.ShippingQty;
 import com.josevi.gastos.models.enums.Group;
 import com.josevi.gastos.models.enums.Store;
 import com.josevi.gastos.repositories.ProductRepository;
@@ -75,6 +76,7 @@ public class NewShippingActivity extends AppCompatActivity {
         initializeLayout();
         initializeParameters();
         configureHeader();
+        configureDateSelector();
         configureGroupCheckBox();
         configureFindAndAddProducts();
         configureOthers();
@@ -130,11 +132,12 @@ public class NewShippingActivity extends AppCompatActivity {
         shipping = null;
         try {
             shipping = getIntent().getParcelableExtra(SHIPPING_EDIT);
-            productNewShippingListAdapter = new ProductNewShippingListAdapter(shipping, this);
+            productNewShippingListAdapter = new ProductNewShippingListAdapter(shipping, new ArrayList<Product>(), this);
+            dateSelected.setTime(shipping.getDate());
         }
         catch (Exception e) {}
         if (shipping == null)
-            productNewShippingListAdapter = new ProductNewShippingListAdapter(new Shipping(Store.MERCADONA), this);
+            productNewShippingListAdapter = new ProductNewShippingListAdapter(new Shipping(Store.MERCADONA), new ArrayList<Product>(), this);
     }
 
     public void configureHeader() {
@@ -149,14 +152,14 @@ public class NewShippingActivity extends AppCompatActivity {
                         dialog.setLeftButtonListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
-                                selectStore(Store.MERCADONA);
+                                selectStore(Store.MERCADONA, true);
                                 dialog.dismiss();
                             }
                         });
                         dialog.show();
                     }
                     else {
-                        selectStore(Store.MERCADONA);
+                        selectStore(Store.MERCADONA, true);
                     }
                 }
             }
@@ -173,25 +176,25 @@ public class NewShippingActivity extends AppCompatActivity {
                         dialog.setLeftButtonListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
-                                selectStore(Store.ESTANCO);
+                                selectStore(Store.ESTANCO, true);
                                 dialog.dismiss();
                             }
                         });
                         dialog.show();
                     }
                     else {
-                        selectStore(Store.ESTANCO);
+                        selectStore(Store.ESTANCO, true);
                     }
                 }
             }
         });
 
         if (shipping != null) {
-            selectStore(shipping.getStore());
+            selectStore(shipping.getStore(), false);
             totalText.setText(String.format("%.2f", shipping.getTotalPrize()) +" €");
         }
         else
-            selectStore(Store.MERCADONA);
+            selectStore(Store.MERCADONA, true);
     }
 
     public void configureDateSelector() {
@@ -235,7 +238,7 @@ public class NewShippingActivity extends AppCompatActivity {
         });
     }
 
-    public void selectStore(Store store) {
+    public void selectStore(Store store, boolean resetShipping) {
         storeSelected = store;
         uncheckAllGroups();
         findProduct.setText("");
@@ -254,9 +257,35 @@ public class NewShippingActivity extends AppCompatActivity {
                 break;
         }
         productsFinded = new ArrayList<Product>();
-        shipping = new Shipping(store);
-        saveShipping.setEnabled(false);
-        viewShipping.setEnabled(false);
+        if (resetShipping) {
+            shipping = new Shipping(store);
+            saveShipping.setEnabled(false);
+            viewShipping.setEnabled(false);
+        }
+        else {
+            switch (shipping.getStore()) {
+                case MERCADONA:
+                    selectorMercadona.setEnabled(false);
+                    selectorEstanco.setEnabled(false);
+                    selectorMercadona.setVisibility(View.VISIBLE);
+                    selectorEstanco.setVisibility(View.GONE);
+                    break;
+                case ESTANCO:
+                    selectorMercadona.setEnabled(false);
+                    selectorEstanco.setEnabled(false);
+                    selectorMercadona.setVisibility(View.GONE);
+                    selectorEstanco.setVisibility(View.VISIBLE);
+                    break;
+            }
+            if (!shipping.isEmpty()) {
+                saveShipping.setEnabled(true);
+                viewShipping.setEnabled(true);
+            }
+            else {
+                saveShipping.setEnabled(false);
+                viewShipping.setEnabled(false);
+            }
+        }
         reloadTotal();
     }
 
@@ -441,7 +470,7 @@ public class NewShippingActivity extends AppCompatActivity {
 
     public void configureOthers() {
         if (shipping != null)
-            othersText.setText(String.format("%.2f", shipping.getTotalPrize()) +" €");
+            othersText.setText(String.format("%.2f", shipping.getOthers()) +" €");
         else
             shipping = new Shipping(Store.MERCADONA);
 
@@ -454,7 +483,7 @@ public class NewShippingActivity extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 try {
-                    shipping.setOthers(Double.parseDouble(othersText.getText().toString()));
+                    shipping.setOthers(Double.parseDouble(othersText.getText().toString().replace(" €", "")));
                 }
                 catch (Exception pe) {
                     shipping.setOthers(0);
@@ -494,8 +523,8 @@ public class NewShippingActivity extends AppCompatActivity {
         });
     }
 
-    public void addProductToShipping(String code) {
-        shipping.addProduct(code);
+    public void addProductToShipping(Product product) {
+        shipping.addProduct(product);
         viewShipping.setEnabled(true);
         saveShipping.setEnabled(true);
         reloadTotal();
@@ -503,9 +532,9 @@ public class NewShippingActivity extends AppCompatActivity {
 
     public void setPrizeToProduct(String code, double prize) {
         if (shipping.containsKey(code))
-            shipping.put(code, new Pair(shipping.get(code).first, prize));
+            shipping.put(code, new ShippingQty(shipping.get(code).qty, prize));
         else
-            shipping.put(code, new Pair(1, prize));
+            shipping.put(code, new ShippingQty(1, prize));
         viewShipping.setEnabled(true);
         saveShipping.setEnabled(true);
         reloadTotal();
@@ -534,7 +563,7 @@ public class NewShippingActivity extends AppCompatActivity {
         }
         else
             productsFinded = new ArrayList<Product>();
-        productNewShippingListAdapter.setShipping(shipping);
+        productNewShippingListAdapter.setProducts(shipping, productsFinded);
     }
 
     public void uncheckAllGroups() {
@@ -558,11 +587,12 @@ public class NewShippingActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         if (!shipping.isEmpty()) {
-            TwoButtonsDialog exitDialog = new TwoButtonsDialog(this, R.color.red_app);
+            final TwoButtonsDialog exitDialog = new TwoButtonsDialog(this, R.color.red_app);
             exitDialog.setMessage("Si sales, se perderá la compra.");
             exitDialog.setLeftButtonListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    exitDialog.dismiss();
                     NewShippingActivity.super.onBackPressed();
                 }
             });

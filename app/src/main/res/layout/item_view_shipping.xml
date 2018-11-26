@@ -61,7 +61,8 @@
                     android:layout_height="wrap_content"
                     android:id="@+id/shipping_total"
                     android:text="0.00 €"
-                    android:textAlignment="textEnd"/>
+                    android:textAlignment="textEnd"
+                    android:textStyle="bold"/>
 
                 <ImageView
                     android:layout_width="20dp"

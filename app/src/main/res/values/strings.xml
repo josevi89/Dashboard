@@ -1,7 +1,7 @@
 <resources>
 
     <!--General-->
-    <string name="app_name">Gastos Josevi</string>
+    <string name="app_name">Dashboard</string>
 
     <string-array name="months_array">
         <item>Enero</item>

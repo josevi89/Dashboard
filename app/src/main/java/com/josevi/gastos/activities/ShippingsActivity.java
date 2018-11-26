@@ -22,6 +22,7 @@ import com.prolificinteractive.materialcalendarview.DayViewDecorator;
 import com.prolificinteractive.materialcalendarview.DayViewFacade;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
+import com.prolificinteractive.materialcalendarview.OnMonthChangedListener;
 import com.prolificinteractive.materialcalendarview.spans.DotSpan;
 
 import java.util.Calendar;
@@ -55,7 +56,6 @@ public class ShippingsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
 
         initializeLayout();
         initializeParameters();
@@ -146,12 +146,22 @@ public class ShippingsActivity extends AppCompatActivity {
             public void onDateSelected(@NonNull MaterialCalendarView widget, @NonNull CalendarDay date, boolean selected) {
                 dateSelected = date.getCalendar();
                 calendarListView.setAdapter(new ShippingShortListAdapter(shippingRepository.getShippingsInDay(dateSelected), ShippingsActivity.this));
+                calendar.removeDecorators();
+                calendar.addDecorator(new ShippingsDecorator(shippingRepository.getShippingDatesInMonth(dateSelected)));
             }
         });
         calendar.setSelectionColor(getResources().getColor(R.color.red_app));
         calendar.setArrowColor(getResources().getColor(R.color.red_app));
         calendar.setLeftArrowMask(getResources().getDrawable(R.mipmap.icon_left_arrow_red));
         calendar.setRightArrowMask(getResources().getDrawable(R.mipmap.icon_right_arrow_red));
+        calendar.setOnMonthChangedListener(new OnMonthChangedListener() {
+            @Override
+            public void onMonthChanged(MaterialCalendarView widget, CalendarDay date) {
+                dateSelected = date.getCalendar();
+                calendar.removeDecorators();
+                calendar.addDecorator(new ShippingsDecorator(shippingRepository.getShippingDatesInMonth(dateSelected)));
+            }
+        });
     }
 
     private void configureListTab() {
@@ -170,6 +180,7 @@ public class ShippingsActivity extends AppCompatActivity {
                 monthLabel.setText(monthYearFormatter.format(dateSelected.getTime()));
                 listListView.setAdapter(new ShippingListAdapter(shippingRepository.getShippingsInMonth(dateSelected), ShippingsActivity.this));
                 deleteBtn.setVisibility(View.GONE);
+
             }
         });
 
@@ -189,7 +200,7 @@ public class ShippingsActivity extends AppCompatActivity {
             public void onClick(View view) {
                 boolean onlyOne = true;
                 final TwoButtonsDialog deleteDialog = new TwoButtonsDialog(ShippingsActivity.this, R.color.red_app);
-                deleteDialog.setMessage("Se borrará" +(onlyOne ? "" : "n") +" " +"1" +" noticicaci" +(onlyOne ? "ón." : "ones."));
+                deleteDialog.setMessage("Se borrará" +(onlyOne ? "" : "n") +" " +"1" +" compra" +(onlyOne ? "." : "s."));
                 deleteDialog.setLeftButtonListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -209,7 +220,7 @@ public class ShippingsActivity extends AppCompatActivity {
     public void onBackPressed() {
         if (deleteBtn.getVisibility() == View.VISIBLE) {
             final TwoButtonsDialog backDialog = new TwoButtonsDialog(this, R.color.red_app);
-            backDialog.setMessage("Si sale, no se borrarán los eventos marcados.");
+            backDialog.setMessage("Si sale, no se borrarán las compras marcados.");
             backDialog.setLeftButtonListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

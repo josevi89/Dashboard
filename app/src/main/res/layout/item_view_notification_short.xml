@@ -13,23 +13,15 @@
         android:id="@+id/notification_item_container"
         android:gravity="center_vertical">
 
-        <LinearLayout
-            android:id="@+id/notification_notification_container"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical">
-
             <TextView
                 android:id="@+id/notification_short_tag"
-                android:layout_width="70dp"
+                android:layout_width="60dp"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="10dp"
                 android:layout_marginStart="10dp"
                 android:text="TAG"
                 android:textAlignment="viewStart" />
-
-        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -38,8 +30,8 @@
             android:layout_marginLeft="10dp"
             android:id="@+id/notification_info_container"
             android:orientation="horizontal"
-            android:layout_toRightOf="@id/notification_notification_container"
-            android:layout_toEndOf="@id/notification_notification_container"
+            android:layout_toRightOf="@id/notification_short_tag"
+            android:layout_toEndOf="@id/notification_short_tag"
             android:gravity="center_vertical">
 
             <TextView

@@ -26,6 +26,7 @@ public class Notification implements Comparable<Notification>, Parcelable{
         this.date = date;
         this.title = title;
         this.tag = tag;
+        this.infoList = new ArrayList<Pair<String, String>>();
     }
 
     protected Notification(Parcel in) {

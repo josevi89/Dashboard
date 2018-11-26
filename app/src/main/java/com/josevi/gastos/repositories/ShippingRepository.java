@@ -10,6 +10,7 @@ import android.util.Log;
 
 import com.josevi.gastos.db.DBContract;
 import com.josevi.gastos.models.Shipping;
+import com.josevi.gastos.models.ShippingQty;
 import com.josevi.gastos.models.enums.Store;
 import com.josevi.gastos.utils.Utils;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
@@ -43,20 +44,20 @@ public class ShippingRepository {
         Map<Integer, Map<Integer, Map<Integer, List<Shipping>>>> shippingsMap =
                 new HashMap<Integer, Map<Integer, Map<Integer,List<Shipping>>>>();
 
-        Map<String, Pair<Integer, Double>> newShippingMap201810272114 = new HashMap<String, Pair<Integer, Double>>();
-        newShippingMap201810272114.put("MDR2", new Pair(2, null));
-        newShippingMap201810272114.put("MFR0", new Pair(1, null));
-        newShippingMap201810272114.put("MBF0", new Pair(1, null));
+        Map<String, ShippingQty> newShippingMap201810272114 = new HashMap<String, ShippingQty>();
+        newShippingMap201810272114.put("MDR2", new ShippingQty(2, 0.5d));
+        newShippingMap201810272114.put("MFR0", new ShippingQty(1, 2d));
+        newShippingMap201810272114.put("MBF0", new ShippingQty(1, 1.2d));
         Shipping newShipping201810272114 = new Shipping(newShippingMap201810272114, Store.MERCADONA, 0.0);
         try {
             newShipping201810272114.setDate(shortDateFormat.parse("201810272114"));
         } catch (ParseException pe) {}
         addToMap("27/10/2018", newShipping201810272114, shippingsMap);
 
-        Map<String, Pair<Integer, Double>> newShippingMap201808252114 = new HashMap<String, Pair<Integer, Double>>();
-        newShippingMap201808252114.put("MDR2", new Pair(2, null));
-        newShippingMap201808252114.put("MFR0", new Pair(3, null));
-        newShippingMap201808252114.put("MBF0", new Pair(1, null));
+        Map<String, ShippingQty> newShippingMap201808252114 = new HashMap<String, ShippingQty>();
+        newShippingMap201808252114.put("MDR2", new ShippingQty(2, 0.5d));
+        newShippingMap201808252114.put("MFR0", new ShippingQty(3, 2d));
+        newShippingMap201808252114.put("MBF0", new ShippingQty(1, 1.2d));
         Shipping newShipping201808252114 = new Shipping(newShippingMap201808252114, Store.MERCADONA, 0.0);
         try {
             newShipping201808252114.setDate(shortDateFormat.parse("201808252114"));

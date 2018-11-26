@@ -190,11 +190,12 @@ public class NewNotificationActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         if (!title.getText().toString().isEmpty() || !infoList.isEmpty()) {
-            TwoButtonsDialog exitDialog = new TwoButtonsDialog(this, R.color.red_app);
+            final TwoButtonsDialog exitDialog = new TwoButtonsDialog(this, R.color.blue_app);
             exitDialog.setMessage("Si sales, se perderán los cambios.");
             exitDialog.setLeftButtonListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    exitDialog.dismiss();
                     NewNotificationActivity.super.onBackPressed();
                 }
             });

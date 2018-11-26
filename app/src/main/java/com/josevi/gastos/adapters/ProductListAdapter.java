@@ -40,7 +40,7 @@ public class ProductListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View itemView = View.inflate(parent.getContext(), R.layout.item_view_product_new_shipping, null);
+        View itemView = View.inflate(parent.getContext(), R.layout.item_view_product, null);
         return new ProductViewHolder(itemView);
     }
 
@@ -51,9 +51,9 @@ public class ProductListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         final Product product = productRepository.findProductByCode(productCode);
         productViewHolder.name.setText(product.getName());
 
-        int qty = shipping.get(productCode).first;
-        Double prize = shipping.get(productCode).second != null && shipping.get(productCode).second > 1 ?
-                shipping.get(productCode).second : product.getPrize() > 0 ? product.getPrize() : 0;
+        int qty = shipping.get(productCode).qty;
+        double prize = shipping.get(productCode).prize != -1 ?
+                shipping.get(productCode).prize : product.getPrize() > 0 ? product.getPrize() : 0;
 
         productViewHolder.prize.setText(String.format(String.format("%.2f", prize)) + " €");
         productViewHolder.qty.setText(String.valueOf(qty));
@@ -70,9 +70,9 @@ public class ProductListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
         public ProductViewHolder(View v) {
             super(v);
-            name = v.findViewById(R.id.product_new_shipping_name);
-            prize = v.findViewById(R.id.product_new_shipping_prize);
-            qty = v.findViewById(R.id.product_new_shipping_qty);
+            name = v.findViewById(R.id.product_name);
+            prize = v.findViewById(R.id.product_prize);
+            qty = v.findViewById(R.id.product_qty);
         }
     }
 

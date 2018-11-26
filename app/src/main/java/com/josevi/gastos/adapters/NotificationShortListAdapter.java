@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import static com.josevi.gastos.utils.Constantes.prettyDayDateFormat;
 import static com.josevi.gastos.utils.Constantes.timeDateFormat;
 
 public class NotificationShortListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -47,12 +48,8 @@ public class NotificationShortListAdapter extends RecyclerView.Adapter<RecyclerV
 
         notificationViewHolder.tag.setText(activity.getResources()
                 .getStringArray(R.array.notification_tag_array)[notification.getTag().ordinal()]);
-        Calendar notificationDate = Calendar.getInstance();
-        notificationDate.setTime(notification.getDate());
-        String date = String.valueOf(notificationDate.get(Calendar.DAY_OF_MONTH)) +" "
-                +activity.getResources().getStringArray(
-                        R.array.months_short_array)[notificationDate.get(Calendar.MONTH)] +" "
-                + timeDateFormat.format(notificationDate.getTime());
+        String date = prettyDayDateFormat.format(notification.getDate()) +" "
+                + timeDateFormat.format(notification.getDate());
         notificationViewHolder.date.setText(date);
         notificationViewHolder.title.setText(notification.getTitle());
     }
