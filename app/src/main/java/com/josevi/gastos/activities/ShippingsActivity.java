@@ -35,7 +35,7 @@ import static com.prolificinteractive.materialcalendarview.MaterialCalendarView.
 
 public class ShippingsActivity extends AppCompatActivity {
 
-    private ImageView calendarTabSelector, listTabSelector;
+    private ImageView calendarTabSelector, listTabSelector, graphsTabSelector;
 
     private LinearLayout calendarTab;
     private MaterialCalendarView calendar;
@@ -46,6 +46,9 @@ public class ShippingsActivity extends AppCompatActivity {
     private ImageView listLeftArrow, listRightArrow;
     private TextView monthLabel;
     private RecyclerView listListView;
+
+    private LinearLayout graphsTab;
+    private RecyclerView graphsCardsContainer;
 
     private Button deleteBtn;
 
@@ -69,6 +72,7 @@ public class ShippingsActivity extends AppCompatActivity {
 
         calendarTabSelector = findViewById(R.id.shippings_calendar_selector);
         listTabSelector = findViewById(R.id.shippings_list_selector);
+        graphsTabSelector = findViewById(R.id.shippings_graphs_selector);
 
         calendarTab = findViewById(R.id.shippings_calendar_tab);
         calendar = findViewById(R.id.shippings_calendar_calendar);
@@ -80,6 +84,9 @@ public class ShippingsActivity extends AppCompatActivity {
         monthLabel = findViewById(R.id.shippings_list_month_label);
         listListView = findViewById(R.id.shippings_list_list);
         deleteBtn = findViewById(R.id.shippings_list_delete_btn);
+
+        graphsTab = findViewById(R.id.shippings_graphs_tab);
+        graphsCardsContainer = findViewById(R.id.shippings_graphs_cards_container);
     }
 
     private void initializeParameters() {
@@ -99,8 +106,10 @@ public class ShippingsActivity extends AppCompatActivity {
                     calendarListView.setAdapter(new ShippingShortListAdapter(shippingRepository.getShippingsInDay(dateSelected), ShippingsActivity.this));
                     calendarTabSelector.setImageDrawable(getResources().getDrawable(R.mipmap.icon_calendar_red));
                     listTabSelector.setImageDrawable(getResources().getDrawable(R.mipmap.icon_list_red_unchecked));
+                    calendarTabSelector.setImageDrawable(getResources().getDrawable(R.mipmap.icon_graphs_red_unchecked));
                     calendarTab.setVisibility(View.VISIBLE);
                     listTab.setVisibility(View.GONE);
+                    graphsTab.setVisibility(View.GONE);
                 }
             }
         });
@@ -115,8 +124,28 @@ public class ShippingsActivity extends AppCompatActivity {
                     calendarListView.setAdapter(new ShippingShortListAdapter(shippingRepository.getShippingsInDay(dateSelected), ShippingsActivity.this));
                     calendarTabSelector.setImageDrawable(getResources().getDrawable(R.mipmap.icon_calendar_red_unchecked));
                     listTabSelector.setImageDrawable(getResources().getDrawable(R.mipmap.icon_list_red));
+                    calendarTabSelector.setImageDrawable(getResources().getDrawable(R.mipmap.icon_graphs_red_unchecked));
                     calendarTab.setVisibility(View.GONE);
                     listTab.setVisibility(View.VISIBLE);
+                    graphsTab.setVisibility(View.GONE);
+                }
+            }
+        });
+
+        listTabSelector.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (tabSelected != 2) {
+                    tabSelected = 2;
+                    dateSelected = Calendar.getInstance();
+                    calendar.setSelectedDate(dateSelected);
+                    calendarListView.setAdapter(new ShippingShortListAdapter(shippingRepository.getShippingsInDay(dateSelected), ShippingsActivity.this));
+                    calendarTabSelector.setImageDrawable(getResources().getDrawable(R.mipmap.icon_calendar_red_unchecked));
+                    listTabSelector.setImageDrawable(getResources().getDrawable(R.mipmap.icon_list_red_unchecked));
+                    calendarTabSelector.setImageDrawable(getResources().getDrawable(R.mipmap.icon_graphs_red));
+                    calendarTab.setVisibility(View.GONE);
+                    listTab.setVisibility(View.GONE);
+                    graphsTab.setVisibility(View.VISIBLE);
                 }
             }
         });
@@ -210,6 +239,10 @@ public class ShippingsActivity extends AppCompatActivity {
                 deleteDialog.show();
             }
         });
+    }
+
+    public void configureGraphsTab() {
+
     }
 
     public void setDeleteButtonVisibility(boolean visible) {

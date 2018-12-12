@@ -158,7 +158,34 @@ public class ShippingRepository {
             return shippings;
         }
         else
-            return null;
+            return new ArrayList<List<Shipping>>();
+    }
+
+    public Map<Store, List<Shipping>> getShippingsInMonthMappedByStore(Calendar date) {
+        String[] dateSplitted = dayDateFormat.format(date.getTime()).split("/");
+        Integer month = Integer.parseInt(dateSplitted[1]),
+                year = Integer.parseInt(dateSplitted[2]);
+        Map<Store, List<Shipping>> shippingsMapped = new HashMap<Store, List<Shipping>>();
+        if (shippingsMap.containsKey(year) && shippingsMap.get(year).containsKey(month)) {
+            int monthDays = 31;
+            switch (month) {
+                case 2:
+                    monthDays = 28;
+                    break;
+                case 4:
+                case 6:
+                case 9:
+                case 11:
+                    monthDays = 30;
+            }
+            for (Store store: Store.values())
+                shippingsMapped.put(store, new ArrayList<Shipping>());
+            for (int d = 0; d < monthDays; d++)
+                if (shippingsMap.get(year).get(month).containsKey(new Integer(d)))
+                    for (Shipping shipping: shippingsMap.get(year).get(month).get(d))
+                        shippingsMapped.get(shipping.getStore()).add(shipping);
+        }
+        return shippingsMapped;
     }
 
     public List<List<List<Shipping>>> getShippingsInThreeMonths(Calendar date) {

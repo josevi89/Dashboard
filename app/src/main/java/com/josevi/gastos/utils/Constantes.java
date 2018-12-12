@@ -15,14 +15,15 @@ public class Constantes {
 
     //CoreActivity
     public static final int CORE_CARD_NOTIFICATIONS_NUMBER = 0;
-    public static final int CORE_CARD_GASTOS_NUMBER = 1;
+    public static final int CORE_CARD_SHIPPINGS_NUMBER = 1;
 
     //ShippingsActivity
-    public static String SHIPPING_FRAGMENT_SHIPPING = "SHIPPING_FRAGMENT_SHIPPING";
-    public static String SHIPPING_FRAGMENT_TAG = "SHIPPING_FRAGMENT_TAG";
-    public static String SHIPPING_EDIT = "SHIPPING_EDIT";
+    public static final String SHIPPING_FRAGMENT_SHIPPING = "SHIPPING_FRAGMENT_SHIPPING";
+    public static final String SHIPPING_FRAGMENT_TAG = "SHIPPING_FRAGMENT_TAG";
+    public static final String SHIPPING_EDIT = "SHIPPING_EDIT";
+    public static final int SHIPPINGS_GRAPHS_CARD_PIECHART_NUMBER = 0;
 
     //NotificationsActivity
-    public static String NOTIFICATION_EDIT = "NOTIFICATION_EDIT";
+    public static final String NOTIFICATION_EDIT = "NOTIFICATION_EDIT";
 
 }

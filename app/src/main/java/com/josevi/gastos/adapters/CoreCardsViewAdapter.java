@@ -19,34 +19,32 @@ import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.josevi.gastos.R;
-import com.josevi.gastos.activities.NewNotificationActivity;
 import com.josevi.gastos.activities.NotificationsActivity;
 import com.josevi.gastos.activities.ShippingsActivity;
-import com.josevi.gastos.cards.CoreCard;
+import com.josevi.gastos.cards.Card;
 import com.josevi.gastos.models.Notification;
 import com.josevi.gastos.models.Shipping;
 import com.josevi.gastos.repositories.NotificationRepository;
 import com.josevi.gastos.repositories.ShippingRepository;
-import com.josevi.gastos.utils.Utils;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import static com.josevi.gastos.utils.Constantes.CORE_CARD_GASTOS_NUMBER;
+import static com.josevi.gastos.utils.Constantes.CORE_CARD_SHIPPINGS_NUMBER;
 import static com.josevi.gastos.utils.Constantes.CORE_CARD_NOTIFICATIONS_NUMBER;
 
 public class CoreCardsViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    List<CoreCard> cards;
+    List<Card> cards;
 
     ShippingRepository shippingRepository;
     NotificationRepository notificationRepository;
 
     Activity activity;
 
-    public CoreCardsViewAdapter(List<CoreCard> cards, Activity activity) {
+    public CoreCardsViewAdapter(List<Card> cards, Activity activity) {
         this.cards = cards;
         this.shippingRepository = new ShippingRepository();
         this.notificationRepository = new NotificationRepository();
@@ -57,27 +55,30 @@ public class CoreCardsViewAdapter extends RecyclerView.Adapter<RecyclerView.View
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = null;
         RecyclerView.ViewHolder viewHolder = null;
-        if(viewType == CORE_CARD_NOTIFICATIONS_NUMBER) {
-            view = View.inflate(parent.getContext(), R.layout.core_card_notifications, null);
-            viewHolder = new ViewHolderNotifications(view);
-        }
-        else if(viewType == CORE_CARD_GASTOS_NUMBER) {
-            view = View.inflate(parent.getContext(), R.layout.core_card_gastos, null);
-            viewHolder = new ViewHolderGastos(view);
+        switch(viewType) {
+            case CORE_CARD_NOTIFICATIONS_NUMBER:
+                view = View.inflate(parent.getContext(), R.layout.card_core_notifications, null);
+                viewHolder = new ViewHolderNotifications(view);
+                break;
+            case CORE_CARD_SHIPPINGS_NUMBER:
+                view = View.inflate(parent.getContext(), R.layout.card_core_shippings, null);
+                viewHolder = new ViewHolderShippings(view);
+                break;
         }
         return viewHolder;
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        int viewType = getItemViewType(position);
-        if(viewType == CORE_CARD_NOTIFICATIONS_NUMBER) {
-            ViewHolderNotifications viewHolderNotifications = (ViewHolderNotifications) holder;
-            configureHolderNotifications(viewHolderNotifications);
-        }
-        else if(viewType == CORE_CARD_GASTOS_NUMBER) {
-            ViewHolderGastos viewHolderGastos = (ViewHolderGastos) holder;
-            configureHolderGastos(viewHolderGastos);
+        switch (getItemViewType(position)) {
+            case CORE_CARD_NOTIFICATIONS_NUMBER:
+                ViewHolderNotifications viewHolderNotifications = (ViewHolderNotifications) holder;
+                configureHolderNotifications(viewHolderNotifications);
+                break;
+            case CORE_CARD_SHIPPINGS_NUMBER:
+                ViewHolderShippings viewHolderShippings = (ViewHolderShippings) holder;
+                configureHolderGastos(viewHolderShippings);
+                break;
         }
     }
 
@@ -91,17 +92,17 @@ public class CoreCardsViewAdapter extends RecyclerView.Adapter<RecyclerView.View
         return cards.size();
     }
 
-    public void configureHolderGastos(ViewHolderGastos viewHolderGastos) {
+    public void configureHolderGastos(ViewHolderShippings viewHolderShippings) {
         List<List<List<Shipping>>> monthShippings = shippingRepository.getShippingsInThreeMonths(Calendar.getInstance());
         double total = 0;
         for (List<Shipping> dayShippings: monthShippings.get(1))
             for (Shipping shipping: dayShippings)
                 total += shipping.getTotalPrize();
-        viewHolderGastos.totalText.setText(String.format("%.2f", total) +" €");
-        configureGastosCoreChart(viewHolderGastos.gastosChart);
-        setGastosCoreChartData(viewHolderGastos.gastosChart, monthShippings);
+        viewHolderShippings.totalText.setText(String.format("%.2f", total) +" €");
+        configureGastosCoreChart(viewHolderShippings.chart);
+        setGastosCoreChartData(viewHolderShippings.chart, monthShippings);
         
-        viewHolderGastos.cardContainer.setOnClickListener(new View.OnClickListener() {
+        viewHolderShippings.cardContainer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(activity, ShippingsActivity.class);
@@ -257,16 +258,16 @@ public class CoreCardsViewAdapter extends RecyclerView.Adapter<RecyclerView.View
         }
     }
 
-    public class ViewHolderGastos extends RecyclerView.ViewHolder {
+    public class ViewHolderShippings extends RecyclerView.ViewHolder {
 
         private CardView cardContainer;
-        private BarChart gastosChart;
+        private BarChart chart;
         private TextView totalText;
 
-        public ViewHolderGastos(View v) {
+        public ViewHolderShippings(View v) {
             super(v);
             cardContainer = v.findViewById(R.id.core_gastos_card_card_view);
-            gastosChart = v.findViewById(R.id.core_gastos_chart);
+            chart = v.findViewById(R.id.core_gastos_chart);
             totalText = v.findViewById(R.id.core_gastos_card_total_text);
         }
     }

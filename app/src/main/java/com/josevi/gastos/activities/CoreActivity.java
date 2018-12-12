@@ -11,11 +11,11 @@ import android.view.View;
 
 import com.josevi.gastos.R;
 import com.josevi.gastos.adapters.CoreCardsViewAdapter;
-import com.josevi.gastos.cards.CoreCard;
+import com.josevi.gastos.cards.Card;
 
 import java.util.ArrayList;
 
-import static com.josevi.gastos.utils.Constantes.CORE_CARD_GASTOS_NUMBER;
+import static com.josevi.gastos.utils.Constantes.CORE_CARD_SHIPPINGS_NUMBER;
 import static com.josevi.gastos.utils.Constantes.CORE_CARD_NOTIFICATIONS_NUMBER;
 
 public class CoreActivity extends AppCompatActivity {
@@ -54,9 +54,9 @@ public class CoreActivity extends AppCompatActivity {
 
     public void initializeCardContainers() {
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
-        ArrayList<CoreCard> listOfCards = new ArrayList<>();
-        listOfCards.add(new CoreCard(R.layout.core_card_notifications, CORE_CARD_NOTIFICATIONS_NUMBER));
-        listOfCards.add(new CoreCard(R.layout.core_card_gastos, CORE_CARD_GASTOS_NUMBER));
+        ArrayList<Card> listOfCards = new ArrayList<>();
+        listOfCards.add(new Card(R.layout.card_core_notifications, CORE_CARD_NOTIFICATIONS_NUMBER));
+        listOfCards.add(new Card(R.layout.card_core_shippings, CORE_CARD_SHIPPINGS_NUMBER));
 
         coreCardRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         coreCardRecyclerView.setAdapter(new CoreCardsViewAdapter(listOfCards, this));
