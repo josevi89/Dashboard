@@ -44,25 +44,34 @@ public class ShippingRepository {
         Map<Integer, Map<Integer, Map<Integer, List<Shipping>>>> shippingsMap =
                 new HashMap<Integer, Map<Integer, Map<Integer,List<Shipping>>>>();
 
-        Map<String, ShippingQty> newShippingMap201810272114 = new HashMap<String, ShippingQty>();
-        newShippingMap201810272114.put("MDR2", new ShippingQty(2, 0.5d));
-        newShippingMap201810272114.put("MFR0", new ShippingQty(1, 2d));
-        newShippingMap201810272114.put("MBF0", new ShippingQty(1, 1.2d));
-        Shipping newShipping201810272114 = new Shipping(newShippingMap201810272114, Store.MERCADONA, 0.0);
+        Map<String, ShippingQty> newShippingMap201812082114 = new HashMap<String, ShippingQty>();
+        newShippingMap201812082114.put("MDR2", new ShippingQty(2, 0.5d));
+        newShippingMap201812082114.put("MFR0", new ShippingQty(1, 2d));
+        newShippingMap201812082114.put("MBF0", new ShippingQty(1, 1.2d));
+        Shipping newShipping201812082114 = new Shipping(newShippingMap201812082114, Store.MERCADONA, 0.0);
         try {
-            newShipping201810272114.setDate(shortDateFormat.parse("201810272114"));
+            newShipping201812082114.setDate(shortDateFormat.parse("201812082114"));
         } catch (ParseException pe) {}
-        addToMap("27/10/2018", newShipping201810272114, shippingsMap);
+        addToMap("08/12/2018", newShipping201812082114, shippingsMap);
 
-        Map<String, ShippingQty> newShippingMap201808252114 = new HashMap<String, ShippingQty>();
-        newShippingMap201808252114.put("MDR2", new ShippingQty(2, 0.5d));
-        newShippingMap201808252114.put("MFR0", new ShippingQty(3, 2d));
-        newShippingMap201808252114.put("MBF0", new ShippingQty(1, 1.2d));
-        Shipping newShipping201808252114 = new Shipping(newShippingMap201808252114, Store.MERCADONA, 0.0);
+        Map<String, ShippingQty> newShippingMap201812131214 = new HashMap<String, ShippingQty>();
+        newShippingMap201812131214.put("MDR2", new ShippingQty(2, 0.5d));
+        newShippingMap201812131214.put("MFR0", new ShippingQty(3, 2d));
+        newShippingMap201812131214.put("MBF0", new ShippingQty(1, 1.2d));
+        Shipping newShipping201812131214 = new Shipping(newShippingMap201812131214, Store.MERCADONA, 0.0);
         try {
-            newShipping201808252114.setDate(shortDateFormat.parse("201808252114"));
+            newShipping201812131214.setDate(shortDateFormat.parse("201812131214"));
         } catch (ParseException pe) {}
-        addToMap("25/08/2018", newShipping201808252114, shippingsMap);
+        addToMap("13/12/2018", newShipping201812131214, shippingsMap);
+
+        Map<String, ShippingQty> newShippingMap201812101214 = new HashMap<String, ShippingQty>();
+        newShippingMap201812101214.put("ETO0", new ShippingQty(1, 5.2d));
+        newShippingMap201812101214.put("EPA0", new ShippingQty(2, 0.5));
+        Shipping newShipping201812101214 = new Shipping(newShippingMap201812101214, Store.ESTANCO, 0.0);
+        try {
+            newShipping201812101214.setDate(shortDateFormat.parse("201812101214"));
+        } catch (ParseException pe) {}
+        addToMap("10/12/2018", newShipping201812101214, shippingsMap);
 
         this.shippingsMap = Collections.unmodifiableMap(shippingsMap);
     }
@@ -111,7 +120,8 @@ public class ShippingRepository {
                 month = Integer.parseInt(dateSplitted[1]),
                 year = Integer.parseInt(dateSplitted[2]);
         try {
-            return shippingsMap.get(year).get(month).get(day);
+            return shippingsMap.get(year).get(month).get(day) != null ?
+                    shippingsMap.get(year).get(month).get(day) : new ArrayList<Shipping>();
         }
         catch (Exception e){}
         return new ArrayList<Shipping>();
@@ -166,6 +176,8 @@ public class ShippingRepository {
         Integer month = Integer.parseInt(dateSplitted[1]),
                 year = Integer.parseInt(dateSplitted[2]);
         Map<Store, List<Shipping>> shippingsMapped = new HashMap<Store, List<Shipping>>();
+        for (Store store: Store.vals())
+            shippingsMapped.put(store, new ArrayList<Shipping>());
         if (shippingsMap.containsKey(year) && shippingsMap.get(year).containsKey(month)) {
             int monthDays = 31;
             switch (month) {
@@ -178,8 +190,6 @@ public class ShippingRepository {
                 case 11:
                     monthDays = 30;
             }
-            for (Store store: Store.values())
-                shippingsMapped.put(store, new ArrayList<Shipping>());
             for (int d = 0; d < monthDays; d++)
                 if (shippingsMap.get(year).get(month).containsKey(new Integer(d)))
                     for (Shipping shipping: shippingsMap.get(year).get(month).get(d))
@@ -258,5 +268,32 @@ public class ShippingRepository {
             Log.d("ShippingData", cVVector.toString());
             Log.d("ShippingRepository", "ShippingTask Complete. " + inserted + " Inserted");
         }
+    }
+
+    public List<Shipping> getShippingsInMonthInStore(Store store, Calendar date) {
+        String[] dateSplitted = dayDateFormat.format(date.getTime()).split("/");
+        Integer month = Integer.parseInt(dateSplitted[1]),
+                year = Integer.parseInt(dateSplitted[2]);
+        if (shippingsMap.containsKey(year) && shippingsMap.get(year).containsKey(month)) {
+            int monthDays = 31;
+            switch (month) {
+                case 2:
+                    monthDays = 28;
+                    break;
+                case 4:
+                case 6:
+                case 9:
+                case 11:
+                    monthDays = 30;
+            }
+            List<Shipping> shippingsInStore = new ArrayList<Shipping>();
+            for (int d = 0; d < monthDays; d++)
+                if (shippingsMap.get(year).get(month).containsKey(new Integer(d)))
+                    for (Shipping shipping: shippingsMap.get(year).get(month).get(d))
+                        if (shipping.getStore() == store)
+                            shippingsInStore.add(shipping);
+            return shippingsInStore;
+        }
+        return new ArrayList<Shipping>();
     }
 }

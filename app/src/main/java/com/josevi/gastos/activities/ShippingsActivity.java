@@ -13,8 +13,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.josevi.gastos.R;
+import com.josevi.gastos.adapters.ShippingGraphsCardsViewAdapter;
 import com.josevi.gastos.adapters.ShippingListAdapter;
 import com.josevi.gastos.adapters.ShippingShortListAdapter;
+import com.josevi.gastos.cards.Card;
 import com.josevi.gastos.dialogs.TwoButtonsDialog;
 import com.josevi.gastos.repositories.ShippingRepository;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
@@ -25,10 +27,14 @@ import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
 import com.prolificinteractive.materialcalendarview.OnMonthChangedListener;
 import com.prolificinteractive.materialcalendarview.spans.DotSpan;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 
+import static com.josevi.gastos.utils.Constantes.SHIPPINGS_GRAPHS_CARD_PERCENT_CHARTS_NUMBER;
+import static com.josevi.gastos.utils.Constantes.SHIPPINGS_GRAPHS_CARD_TOTAL_CHARTS_NUMBER;
 import static com.josevi.gastos.utils.Constantes.monthYearFormatter;
 import static com.prolificinteractive.materialcalendarview.MaterialCalendarView.SELECTION_MODE_SINGLE;
 import static com.prolificinteractive.materialcalendarview.MaterialCalendarView.SHOW_NONE;
@@ -65,6 +71,7 @@ public class ShippingsActivity extends AppCompatActivity {
         configureHeader();
         configureCalendarTab();
         configureListTab();
+        configureGraphsTab();
     }
 
     private void initializeLayout() {
@@ -106,7 +113,7 @@ public class ShippingsActivity extends AppCompatActivity {
                     calendarListView.setAdapter(new ShippingShortListAdapter(shippingRepository.getShippingsInDay(dateSelected), ShippingsActivity.this));
                     calendarTabSelector.setImageDrawable(getResources().getDrawable(R.mipmap.icon_calendar_red));
                     listTabSelector.setImageDrawable(getResources().getDrawable(R.mipmap.icon_list_red_unchecked));
-                    calendarTabSelector.setImageDrawable(getResources().getDrawable(R.mipmap.icon_graphs_red_unchecked));
+                    graphsTabSelector.setImageDrawable(getResources().getDrawable(R.mipmap.icon_graphs_red_unchecked));
                     calendarTab.setVisibility(View.VISIBLE);
                     listTab.setVisibility(View.GONE);
                     graphsTab.setVisibility(View.GONE);
@@ -124,7 +131,7 @@ public class ShippingsActivity extends AppCompatActivity {
                     calendarListView.setAdapter(new ShippingShortListAdapter(shippingRepository.getShippingsInDay(dateSelected), ShippingsActivity.this));
                     calendarTabSelector.setImageDrawable(getResources().getDrawable(R.mipmap.icon_calendar_red_unchecked));
                     listTabSelector.setImageDrawable(getResources().getDrawable(R.mipmap.icon_list_red));
-                    calendarTabSelector.setImageDrawable(getResources().getDrawable(R.mipmap.icon_graphs_red_unchecked));
+                    graphsTabSelector.setImageDrawable(getResources().getDrawable(R.mipmap.icon_graphs_red_unchecked));
                     calendarTab.setVisibility(View.GONE);
                     listTab.setVisibility(View.VISIBLE);
                     graphsTab.setVisibility(View.GONE);
@@ -132,7 +139,7 @@ public class ShippingsActivity extends AppCompatActivity {
             }
         });
 
-        listTabSelector.setOnClickListener(new View.OnClickListener() {
+        graphsTabSelector.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (tabSelected != 2) {
@@ -142,7 +149,7 @@ public class ShippingsActivity extends AppCompatActivity {
                     calendarListView.setAdapter(new ShippingShortListAdapter(shippingRepository.getShippingsInDay(dateSelected), ShippingsActivity.this));
                     calendarTabSelector.setImageDrawable(getResources().getDrawable(R.mipmap.icon_calendar_red_unchecked));
                     listTabSelector.setImageDrawable(getResources().getDrawable(R.mipmap.icon_list_red_unchecked));
-                    calendarTabSelector.setImageDrawable(getResources().getDrawable(R.mipmap.icon_graphs_red));
+                    graphsTabSelector.setImageDrawable(getResources().getDrawable(R.mipmap.icon_graphs_red));
                     calendarTab.setVisibility(View.GONE);
                     listTab.setVisibility(View.GONE);
                     graphsTab.setVisibility(View.VISIBLE);
@@ -242,7 +249,11 @@ public class ShippingsActivity extends AppCompatActivity {
     }
 
     public void configureGraphsTab() {
-
+        List<Card> cards = new ArrayList<Card>();
+        cards.add(new Card(R.layout.card_shipping_graphs_percent_charts, SHIPPINGS_GRAPHS_CARD_PERCENT_CHARTS_NUMBER));
+        cards.add(new Card(R.layout.card_shipping_graphs_total_charts, SHIPPINGS_GRAPHS_CARD_TOTAL_CHARTS_NUMBER));
+        graphsCardsContainer.setLayoutManager(new LinearLayoutManager(this));
+        graphsCardsContainer.setAdapter(new ShippingGraphsCardsViewAdapter(cards, this));
     }
 
     public void setDeleteButtonVisibility(boolean visible) {

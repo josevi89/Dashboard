@@ -17,8 +17,43 @@
 
     <color name="green_mercadona">#008800</color>
     <color name="brown_estanco">#964B00</color>
+    <color name="purple_roll">#AA00AA</color>
     <color name="blue_caixa">#2222FF</color>
     <color name="red_alimentation">#FF0000</color>
+
+    <color name="green_meat">#008800</color>
+    <color name="green_fish">#00AA00</color>
+    <color name="green_milk">#00CC00</color>
+    <color name="green_bread">#00EE00</color>
+    <color name="green_prepared">#11FF11</color>
+    <color name="green_drinks">#33FF33</color>
+    <color name="green_frozen">#55FF55</color>
+    <color name="green_breakfast">#77FF77</color>
+    <color name="green_animals">#99FF99</color>
+    <color name="green_vegetables">#CCFFCC</color>
+    <color name="green_other">#006600</color>
+    <color name="brown_tobacco">#964B00</color>
+    <color name="brown_paper">#B86D00</color>
+    <color name="brown_filters">#DA8F00</color>
+    <color name="purle_roll_a">#AA00AA</color>
+    <color name="purle_roll_b">#AA55AA</color>
+
+    <color name="brown_meat">#964B00</color>
+    <color name="blue_fish">#4444FF</color>
+    <color name="grey_milk">#AAAAAA</color>
+    <color name="brown_bread">#B86D00</color>
+    <color name="purple_prepared">#AA00AA</color>
+    <color name="orange_drinks">#DA8F00</color>
+    <color name="blue_frozen">#7777FF</color>
+    <color name="red_breakfast">#FF0000</color>
+    <color name="black_animals">#000000</color>
+    <color name="green_vegetables_hc">#33FF33</color>
+    <color name="yellow_other">#DDDD00</color>
+    <color name="blue_tobacco">#7777FF</color>
+    <color name="black_paper">#000000</color>
+    <color name="grey_filters">#DA8F00</color>
+    <color name="green_roll_a">#008800</color>
+    <color name="brown_roll_b">#964B00</color>
 
     <color name="green_a">#00C800</color>
     <color name="brewn_b">#C86400</color>
