@@ -15,6 +15,9 @@ import android.widget.TextView;
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.components.AxisBase;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
@@ -22,7 +25,9 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
+import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.formatter.IValueFormatter;
+import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 import com.github.mikephil.charting.utils.ViewPortHandler;
 import com.josevi.gastos.R;
 import com.josevi.gastos.cards.Card;
@@ -41,6 +46,7 @@ import java.util.Map;
 
 import static com.josevi.gastos.utils.Constantes.SHIPPINGS_GRAPHS_CARD_PERCENT_CHARTS_NUMBER;
 import static com.josevi.gastos.utils.Constantes.SHIPPINGS_GRAPHS_CARD_TOTAL_CHARTS_NUMBER;
+import static com.josevi.gastos.utils.Constantes.SHIPPINGS_GRAPHS_CARD_WEEKLY_TOTAL_CHARTS_NUMBER;
 
 public class ShippingGraphsCardsViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -80,6 +86,10 @@ public class ShippingGraphsCardsViewAdapter extends RecyclerView.Adapter<Recycle
                 view = View.inflate(parent.getContext(), R.layout.card_shipping_graphs_total_charts, null);
                 viewHolder = new ViewHolderTotalCharts(view);
                 break;
+            case SHIPPINGS_GRAPHS_CARD_WEEKLY_TOTAL_CHARTS_NUMBER:
+                view = View.inflate(parent.getContext(), R.layout.card_shipping_graphs_weekly_total_charts, null);
+                viewHolder = new ViewHolderWeeklyTotalCharts(view);
+                break;
         }
         return viewHolder;
     }
@@ -94,6 +104,10 @@ public class ShippingGraphsCardsViewAdapter extends RecyclerView.Adapter<Recycle
             case SHIPPINGS_GRAPHS_CARD_TOTAL_CHARTS_NUMBER:
                 ViewHolderTotalCharts viewHolderTotalCharts = (ViewHolderTotalCharts) holder;
                 configureHolderTotalCharts(viewHolderTotalCharts);
+                break;
+            case SHIPPINGS_GRAPHS_CARD_WEEKLY_TOTAL_CHARTS_NUMBER:
+                ViewHolderWeeklyTotalCharts viewHolderWeeklyTotalCharts = (ViewHolderWeeklyTotalCharts) holder;
+                configureHolderWeeklyTotalCharts(viewHolderWeeklyTotalCharts);
                 break;
         }
     }
@@ -190,7 +204,7 @@ public class ShippingGraphsCardsViewAdapter extends RecyclerView.Adapter<Recycle
             totalShippingsMappedByGroup.put(group, 0d);
 //            colors.add(group.color(activity, false));
         }
-        double total = 0;
+        double total = 0, mercadonaTotal = 0, estancoTotal = 0;
         for (Store store: Store.vals()) {
             double storeTotal = 0;
             for (Shipping shipping: shippingsMappedByStore.get(store)) {
@@ -204,14 +218,17 @@ public class ShippingGraphsCardsViewAdapter extends RecyclerView.Adapter<Recycle
             total += storeTotal;
             switch (store) {
                 case MERCADONA:
+                    mercadonaTotal = storeTotal;
                     holder.mercadonaPercent.setText(String.format("%.1f", storeTotal) +" %");
                     break;
                 case ESTANCO:
-                    holder.estancoPercent.setText(String.format("%.1f", storeTotal) +" %");
+                    estancoTotal = storeTotal;
                     break;
             }
         }
         if (total > 0) {
+            holder.mercadonaPercent.setText(String.format("%.1f", 100 * mercadonaTotal / total) +" %");
+            holder.estancoPercent.setText(String.format("%.1f", 100 * estancoTotal / total) +" %");
             for (Group group: Group.vals()) {
                 float groupPercent = (float)(100 * totalShippingsMappedByGroup.get(group) / total);
                 if (groupPercent > 0) {
@@ -392,7 +409,18 @@ public class ShippingGraphsCardsViewAdapter extends RecyclerView.Adapter<Recycle
         chart.getLegend().setEnabled(false);
 
         chart.setFitBars(true);
-        chart.getXAxis().setEnabled(false);
+
+        XAxis xAxis = chart.getXAxis();
+        xAxis.setEnabled(true);
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setDrawAxisLine(true);
+        xAxis.setAxisLineWidth(2f);
+        xAxis.setDrawGridLines(false);
+        YAxis leftAxis = chart.getAxisLeft();
+        leftAxis.setEnabled(true);
+        leftAxis.setDrawAxisLine(true);
+        leftAxis.setDrawGridLines(true);
+        leftAxis.setAxisLineWidth(2f);
         chart.getAxisRight().setEnabled(false);
 
         chart.invalidate();
@@ -404,17 +432,19 @@ public class ShippingGraphsCardsViewAdapter extends RecyclerView.Adapter<Recycle
         List<BarEntry> entries = new ArrayList<BarEntry>();
         List<Integer> colors = new ArrayList<Integer>();
         List<Legend> legend = new ArrayList<Legend>();
+        List<Store> storesInChart = new ArrayList<Store>();
 
         Map<Store, List<Shipping>> shippingsMappedByStore =
                 shippingRepository.getShippingsInMonthMappedByStore(end);
         Map<Group, Double> totalShippingsMappedByGroup = new HashMap<Group, Double>();
         for (Group group: Group.vals()) {
             totalShippingsMappedByGroup.put(group, 0d);
-//            colors.add(group.color(activity, false));
         }
         double total = 0;
         for (Store store: Store.vals()) {
             for (Shipping shipping: shippingsMappedByStore.get(store)) {
+                if (!storesInChart.contains(store))
+                    storesInChart.add(store);
                 for (Product product: shipping.getProducts()) {
                     totalShippingsMappedByGroup.put(product.getGroup(),
                             totalShippingsMappedByGroup.get(product.getGroup()) +
@@ -424,13 +454,13 @@ public class ShippingGraphsCardsViewAdapter extends RecyclerView.Adapter<Recycle
             }
         }
         if (total > 0) {
-            for (Store store: Store.vals()) {
+            for (Store store: storesInChart) {
                 Group[] groupsInStore = Group.getGroupsFromStore(store);
                 List<Float> groupTotals = new ArrayList<Float>();
                 double storeTotal = 0;
                 for (int g = 0; g < groupsInStore.length; g++) {
                     float groupTotal = (float)(double)(totalShippingsMappedByGroup.get(groupsInStore[g]));
-                    if (groupTotal > 00) {
+                    if (groupTotal > 0) {
                         groupTotals.add(groupTotal);
                         storeTotal += groupTotal;
                         colors.add(groupsInStore[g].color(activity, false));
@@ -456,7 +486,7 @@ public class ShippingGraphsCardsViewAdapter extends RecyclerView.Adapter<Recycle
             holder.principalChartLegend.setLayoutManager(new LinearLayoutManager(activity));
             holder.principalChartLegend.setAdapter(new LegendListAdapter(legend, activity));
         }
-        
+
         BarDataSet dataSet = new BarDataSet(entries, "");
 
         dataSet.setDrawIcons(false);
@@ -469,6 +499,16 @@ public class ShippingGraphsCardsViewAdapter extends RecyclerView.Adapter<Recycle
         BarData data = new BarData(dataSet);
 
         chart.setData(data);
+
+        XAxis xAxis = chart.getXAxis();
+        xAxis.setAxisMinimum(-1);
+        xAxis.setAxisMaximum(storesInChart.size());
+        xAxis.setValueFormatter(new IAxisValueFormatter() {
+            @Override
+            public String getFormattedValue(float value, AxisBase axis) {
+                return value == 0 || value == 1 ? Store.vals()[(int)value].title() : "";
+            }
+        });
         // undo all highlights
         chart.highlightValues(null);
         chart.setExtraBottomOffset(-5); //elimina espacio entre el grafico y la leyenda
@@ -478,7 +518,7 @@ public class ShippingGraphsCardsViewAdapter extends RecyclerView.Adapter<Recycle
         chart.notifyDataSetChanged();
     }
 
-    private void setTotalSecondaryChartData(ViewHolderTotalCharts holder, Store store, boolean highContrastOn) {
+    private void setTotalSecondaryChartData(ViewHolderTotalCharts holder, final Store store, boolean highContrastOn) {
         BarChart chart = holder.secondaryChart;
         totalSecondaryGraphStoreSelected = store;
         List<BarEntry> entries = new ArrayList<BarEntry>();
@@ -510,7 +550,7 @@ public class ShippingGraphsCardsViewAdapter extends RecyclerView.Adapter<Recycle
                     float groupTotal = (float)(double)totalShippingsMappedByGroup.get(groupsInStore[g]);
                     if (groupTotal > 0) {
                         float[] groupTotalArray = {groupTotal};
-                        entries.add(new BarEntry(entries.size(), groupTotalArray));
+                        entries.add(new BarEntry(g, groupTotalArray));
                         colors.add(groupsInStore[g].color(activity, highContrastOn));
                         legend.add(new Legend(groupsInStore[g].color(activity, highContrastOn),
                                 groupsInStore[g].title() +" [" +String.format("%.2f", groupTotal) +" €]"));
@@ -538,9 +578,294 @@ public class ShippingGraphsCardsViewAdapter extends RecyclerView.Adapter<Recycle
 //            }
 //        });
         chart.setData(data);
+
+        XAxis xAxis = chart.getXAxis();
+        xAxis.setAxisMinimum(-1);
+        xAxis.setAxisMaximum(Group.getGroupsFromStore(store).length);
+        xAxis.setLabelRotationAngle(90f);
+        xAxis.setLabelCount((int) xAxis.getAxisMaximum() + 1);
+        xAxis.setValueFormatter(new IAxisValueFormatter() {
+            @Override
+            public String getFormattedValue(float value, AxisBase axis) {
+                return value != -1 && value < Group.getGroupsFromStore(store).length ?
+                        Group.getGroupsFromStore(store)[(int)value].title() : "";
+            }
+        });
         // undo all highlights
         chart.highlightValues(null);
 //        chart.setExtraBottomOffset(-5); //elimina espacio entre el grafico y la leyenda
+
+        chart.invalidate();
+        chart.getData().notifyDataChanged();
+        chart.notifyDataSetChanged();
+    }
+
+    Store weeklytotalSecondaryGraphStoreSelected = null;
+
+    private void configureHolderWeeklyTotalCharts(final ViewHolderWeeklyTotalCharts holder) {
+
+        configureBarChart(holder.principalChart);
+        configureBarChart(holder.secondaryChart);
+        setWeeklyTotalPrincipalChartData(holder);
+        holder.secondaryChartContainer.setVisibility(View.GONE);
+
+        holder.mercadonaAvgContainer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                configureBarChart(holder.secondaryChart);
+                setWeeklyTotalSecondaryChartData(holder, Store.MERCADONA, holder.secondaryChartHighContrastCheckBox.isChecked());
+                holder.secondaryChartContainer.setVisibility(View.VISIBLE);
+                holder.mercadonaAvgContainer.setAlpha(1f);
+                holder.estancoAvgContainer.setAlpha(0.4f);
+            }
+        });
+
+        holder.estancoAvgContainer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                configureBarChart(holder.secondaryChart);
+                setWeeklyTotalSecondaryChartData(holder, Store.ESTANCO, holder.secondaryChartHighContrastCheckBox.isChecked());
+                holder.secondaryChartContainer.setVisibility(View.VISIBLE);
+                holder.mercadonaAvgContainer.setAlpha(0.4f);
+                holder.estancoAvgContainer.setAlpha(1f);
+            }
+        });
+
+        holder.secondaryChartHighContrastCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                if (weeklytotalSecondaryGraphStoreSelected != null)
+                    setWeeklyTotalSecondaryChartData(holder, weeklytotalSecondaryGraphStoreSelected, checked);
+            }
+        });
+
+        holder.unexpandSecondaryChartButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                holder.secondaryChartContainer.setVisibility(View.GONE);
+                holder.mercadonaAvgContainer.setAlpha(1f);
+                holder.estancoAvgContainer.setAlpha(1f);
+            }
+        });
+    }
+
+    private void setWeeklyTotalPrincipalChartData(ViewHolderWeeklyTotalCharts holder) {
+        BarChart chart = holder.principalChart;
+        List<IBarDataSet> dataSets = new ArrayList<IBarDataSet>();
+        List<Store> storesInGraph = new ArrayList<Store>();
+
+        Map<Store, List<Shipping>> shippingsMappedByStore =
+                shippingRepository.getShippingsInMonthMappedByStore(end);
+        Map<Store, List<Map<Group, Double>>> totalShippingsMappedByStoreDayOfWeekAndGroup =
+                new HashMap<Store, List<Map<Group, Double>>>();
+        for (Store store: Store.vals()) {
+            List<Map<Group, Double>> emptyStore = new ArrayList<Map<Group, Double>>();
+            for (int d = 0; d < 7; d++) {
+                Map<Group, Double> emptyDay = new HashMap<Group, Double>();
+                for (Group group : Group.getGroupsFromStore(store))
+                    emptyDay.put(group, 0d);
+                emptyStore.add(emptyDay);
+            }
+            totalShippingsMappedByStoreDayOfWeekAndGroup.put(store, emptyStore);
+
+            for (Shipping shipping : shippingsMappedByStore.get(store)) {
+                if (!storesInGraph.contains(store))
+                    storesInGraph.add(store);
+                Calendar shippingDate = Calendar.getInstance();
+                shippingDate.setTime(shipping.getDate());
+                int dayOfWeek = shippingDate.get(Calendar.DAY_OF_WEEK) != 1 ?
+                        shippingDate.get(Calendar.DAY_OF_WEEK) - 2 : 6;
+                for (Product product : shipping.getProducts()) {
+                    double tmpTotal = totalShippingsMappedByStoreDayOfWeekAndGroup.get(store).get(dayOfWeek).get(product.getGroup());
+                    tmpTotal += shipping.get(product.getCode()).qty * shipping.get(product.getCode()).prize;
+                    totalShippingsMappedByStoreDayOfWeekAndGroup.get(store).get(dayOfWeek).put(product.getGroup(), tmpTotal);
+                }
+            }
+        }
+
+        int nStores = storesInGraph.size();
+        for (int s = 0; s < nStores; s++) {
+            Store store = storesInGraph.get(s);
+            List<BarEntry> entries = new ArrayList<BarEntry>();
+            List<Integer> colors = new ArrayList<Integer>();
+            for (int d = 0; d < 7; d++) {
+                double offset = 0;
+                if(nStores % 2 == 0) {
+                    int half = nStores / 2;
+                    offset = 1.0 / nStores * ((s + 0.5 - half) + (s > half ? 1 : 0));
+                }
+                else {
+                    double half = nStores / 2.0;
+                    offset = 1.0 / nStores * (s + 0.5 - half);
+                }
+
+                List<Float> totalStoreDay = new ArrayList<Float>();
+                for (Group group : Group.getGroupsFromStore(store)) {
+                    if (totalShippingsMappedByStoreDayOfWeekAndGroup.get(store).get(d).get(group) > 0) {
+                        totalStoreDay.add((float) (double) totalShippingsMappedByStoreDayOfWeekAndGroup.get(store).get(d).get(group));
+                        colors.add(group.color(activity, false));
+                    }
+                }
+                
+                if (!totalStoreDay.isEmpty()) {
+                    float[] storeDayValues = new float[totalStoreDay.size()];
+                    for (int g = 0; g < totalStoreDay.size(); g++) {
+                        storeDayValues[g] = totalStoreDay.get(g);
+                    }
+                    entries.add(new BarEntry(d + (float) offset, storeDayValues));
+                }
+                else {
+                    entries.add(new BarEntry(d + (float) offset, new float[]{0}));
+                    colors.add(activity.getResources().getColor(R.color.black));
+                }
+            }
+            BarDataSet dataSet = new BarDataSet(entries, store.title());
+            dataSet.setColors(colors);
+            dataSet.setDrawIcons(false);
+            dataSet.setDrawValues(false);
+            dataSets.add(dataSet);
+        }
+//        List<BarEntry> dayNames = new ArrayList<BarEntry>();
+        double total = 0, totalMercadona = 0, totalEstanco = 0;
+        for (int d = 0; d < 7; d++) {
+            float totalDay = 0;
+            for (int ds = 0; ds < dataSets.size(); ds++) {
+                totalDay += dataSets.get(ds).getEntryForIndex(d).getPositiveSum();
+                if (ds == 0)
+                    totalMercadona += dataSets.get(ds).getEntryForIndex(d).getPositiveSum();
+                else
+                    totalEstanco += dataSets.get(ds).getEntryForIndex(d).getPositiveSum();
+            }
+//            dayNames.add(new BarEntry(d, 0));
+            total += totalDay;
+        }
+
+        XAxis xAxis = chart.getXAxis();
+        xAxis.setAxisMinimum(-1);
+        xAxis.setAxisMaximum(7);
+        xAxis.setValueFormatter(new IAxisValueFormatter() {
+            @Override
+            public String getFormattedValue(float value, AxisBase axis) {
+                String[] daysOfWeek = {"lun", "mar", "mie", "jue", "vie", "sab", "dom"};
+                return value != -1 && value != 7 ? daysOfWeek[(int)value] : "";
+            }
+        });
+
+        holder.dayAvg.setText(String.format("%.2f", total / 7) +" €");
+        holder.mercadonaAvg.setText(String.format("%.2f", totalMercadona / 7) +" €");
+        holder.estancoAvg.setText(String.format("%.2f", totalEstanco / 7) +" €");
+//        BarDataSet dayNamesDataSet = new BarDataSet(dayNames, "");
+//        dataSets.add(0, dayNamesDataSet);
+
+        BarData data = new BarData(dataSets);
+        data.setBarWidth(1f / storesInGraph.size());
+
+        chart.setData(data);
+//        chart.groupBars(0, 0.51f, 0f);
+        chart.setFitBars(true);
+        // undo all highlights
+        chart.highlightValues(null);
+        chart.setExtraBottomOffset(-5); //elimina espacio entre el grafico y la leyenda
+
+        List<Legend> legend = new ArrayList<Legend>();
+        for (Store store: storesInGraph)
+            legend.add(new Legend(store.color(activity), store.title()));
+
+        holder.principalChartLegend.setLayoutManager(new LinearLayoutManager(activity));
+        holder.principalChartLegend.setAdapter(new LegendListAdapter(legend, activity));
+
+        chart.invalidate();
+        chart.getData().notifyDataChanged();
+        chart.notifyDataSetChanged();
+    }
+
+    private void setWeeklyTotalSecondaryChartData(ViewHolderWeeklyTotalCharts holder, Store store, boolean highContrastOn) {
+        BarChart chart = holder.secondaryChart;
+        weeklytotalSecondaryGraphStoreSelected = store;
+
+        List<IBarDataSet> dataSets = new ArrayList<IBarDataSet>();
+//        List<Legend> legend = new ArrayList<Legend>();
+        List<Group> groupsInChart = new ArrayList<Group>();
+
+        Map<Store, List<Shipping>> shippingsMappedByStore =
+                shippingRepository.getShippingsInMonthMappedByStore(end);
+        Map<Store, List<Map<Group, Double>>> totalShippingsMappedByStoreDayOfWeekAndGroup =
+                new HashMap<Store, List<Map<Group, Double>>>();
+        List<Map<Group, Double>> emptyStore = new ArrayList<Map<Group, Double>>();
+        for (int d = 0; d < 7; d++) {
+            Map<Group, Double> emptyDay = new HashMap<Group, Double>();
+            for (Group group: Group.getGroupsFromStore(store))
+                emptyDay.put(group, 0d);
+            emptyStore.add(emptyDay);
+        }
+        totalShippingsMappedByStoreDayOfWeekAndGroup.put(store, emptyStore);
+
+        for (Shipping shipping: shippingsMappedByStore.get(store)) {
+            Calendar shippingDate = Calendar.getInstance();
+            shippingDate.setTime(shipping.getDate());
+            int dayOfWeek = shippingDate.get(Calendar.DAY_OF_WEEK) != 1 ?
+                    shippingDate.get(Calendar.DAY_OF_WEEK) - 2 : 6;
+            for (Product product: shipping.getProducts()) {
+                double tmpTotal = totalShippingsMappedByStoreDayOfWeekAndGroup.get(store).get(dayOfWeek).get(product.getGroup());
+                tmpTotal += shipping.get(product.getCode()).qty * shipping.get(product.getCode()).prize;
+                totalShippingsMappedByStoreDayOfWeekAndGroup.get(store).get(dayOfWeek).put(product.getGroup(), tmpTotal);
+                if (!groupsInChart.contains(product.getGroup()))
+                    groupsInChart.add(product.getGroup());
+
+            }
+        }
+        int nGroups = groupsInChart.size();
+        for (int g = 0; g < nGroups; g++) {
+            Group group = groupsInChart.get(g);
+            List<BarEntry> entries = new ArrayList<BarEntry>();
+            double offset = 0;
+            if(nGroups % 2 == 0) {
+                int half = nGroups / 2;
+                offset = 1.0 / nGroups * ((g - half) + (g > half ? 1 : 0));
+            }
+            else {
+                double half = nGroups / 2.0;
+                offset = 1.0 / nGroups * (g + 0.5 - half);
+            }
+            for (int d = 0; d < 7; d++) {
+                float totalDayGroup = (float)(double) totalShippingsMappedByStoreDayOfWeekAndGroup.get(store).get(d).get(group);
+                if (totalDayGroup > 0) {
+                    entries.add(new BarEntry(d + (float) offset, new float[]{totalDayGroup}));
+                }
+            }
+            BarDataSet dataSet = new BarDataSet(entries, group.title());
+            dataSet.setColor(group.color(activity, highContrastOn));
+            dataSet.setDrawIcons(false);
+            dataSet.setDrawValues(false);
+            dataSets.add(dataSet);
+        }
+
+        XAxis xAxis = chart.getXAxis();
+        xAxis.setAxisMinimum(-1);
+        xAxis.setAxisMaximum(7);
+        xAxis.setValueFormatter(new IAxisValueFormatter() {
+            @Override
+            public String getFormattedValue(float value, AxisBase axis) {
+                String[] daysOfWeek = {"lun", "mar", "mie", "jue", "vie", "sab", "dom"};
+                return value != -1 && value < 7 ? daysOfWeek[(int)value] : "";
+            }
+        });
+
+        BarData data = new BarData(dataSets);
+        data.setBarWidth(1f / nGroups);
+        chart.setData(data);
+//        chart.groupBars(0, 0.51f, 0f);
+        chart.setFitBars(true);
+        // undo all highlights
+        chart.highlightValues(null);
+        chart.setExtraBottomOffset(-5); //elimina espacio entre el grafico y la leyenda
+
+        List<Legend> legend = new ArrayList<Legend>();
+        for (Group group: groupsInChart)
+            legend.add(new Legend(group.color(activity,highContrastOn), group.title()));
+
+        holder.secondaryChartLegend.setLayoutManager(new LinearLayoutManager(activity));
+        holder.secondaryChartLegend.setAdapter(new LegendListAdapter(legend, activity));
 
         chart.invalidate();
         chart.getData().notifyDataChanged();
@@ -613,6 +938,36 @@ public class ShippingGraphsCardsViewAdapter extends RecyclerView.Adapter<Recycle
             totalTotal = v.findViewById(R.id.shipping_graphs_total_charts_principal_chart_total);
             mercadonaTotal = v.findViewById(R.id.shipping_graphs_total_charts_total_mercadona);
             estancoTotal = v.findViewById(R.id.shipping_graphs_total_charts_total_estanco);
+        }
+    }
+
+    public class ViewHolderWeeklyTotalCharts extends RecyclerView.ViewHolder {
+
+        private CardView cardContainer;
+        private BarChart principalChart, secondaryChart;
+        private LinearLayout mercadonaAvgContainer, estancoAvgContainer, rollTotalContainer,
+                secondaryChartContainer;
+        private ImageView unexpandSecondaryChartButton;
+        private RecyclerView principalChartLegend, secondaryChartLegend;
+        private CheckBox secondaryChartHighContrastCheckBox;
+        private TextView dayAvg, mercadonaAvg, estancoAvg;
+
+        public ViewHolderWeeklyTotalCharts(View v) {
+            super(v);
+            cardContainer = v.findViewById(R.id.shipping_graphs_weekly_total_charts_card_card_view);
+            principalChart = v.findViewById(R.id.shipping_graphs_weekly_total_charts_principal_chart);
+            secondaryChart = v.findViewById(R.id.shipping_graphs_weekly_total_charts_secondary_chart);
+            mercadonaAvgContainer = v.findViewById(R.id.shipping_graphs_weekly_total_charts_mercadona_avg_container);
+            estancoAvgContainer = v.findViewById(R.id.shipping_graphs_weekly_total_charts_estanco_avg_container);
+            rollTotalContainer = v.findViewById(R.id.shipping_graphs_weekly_total_charts_roll_total_container);
+            secondaryChartContainer = v.findViewById(R.id.shipping_graphs_weekly_total_charts_secondary_chart_container);
+            unexpandSecondaryChartButton = v.findViewById(R.id.shipping_graphs_weekly_total_charts_secondary_chart_unexpand_button);
+            principalChartLegend = v.findViewById(R.id.shipping_graphs_weekly_total_charts_principal_chart_legend);
+            secondaryChartLegend = v.findViewById(R.id.shipping_graphs_weekly_total_charts_secondary_chart_legend);
+            secondaryChartHighContrastCheckBox = v.findViewById(R.id.shipping_graphs_weekly_total_charts_secondary_chart_high_contrast_checkbox);
+            dayAvg = v.findViewById(R.id.shipping_graphs_weekly_total_charts_day_avg);
+            mercadonaAvg = v.findViewById(R.id.shipping_graphs_weekly_total_charts_mercadona_avg);
+            estancoAvg = v.findViewById(R.id.shipping_graphs_weekly_total_charts_estanco_avg);
         }
     }
 }

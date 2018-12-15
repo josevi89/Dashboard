@@ -73,6 +73,15 @@ public class ShippingRepository {
         } catch (ParseException pe) {}
         addToMap("10/12/2018", newShipping201812101214, shippingsMap);
 
+        Map<String, ShippingQty> newShippingMap201812131530 = new HashMap<String, ShippingQty>();
+        newShippingMap201812131530.put("ETO0", new ShippingQty(1, 5.2d));
+        newShippingMap201812131530.put("EPA0", new ShippingQty(2, 0.5));
+        Shipping newShipping201812131530 = new Shipping(newShippingMap201812131530, Store.ESTANCO, 0.0);
+        try {
+            newShipping201812131530.setDate(shortDateFormat.parse("201812131530"));
+        } catch (ParseException pe) {}
+        addToMap("13/12/2018", newShipping201812131530, shippingsMap);
+
         this.shippingsMap = Collections.unmodifiableMap(shippingsMap);
     }
 

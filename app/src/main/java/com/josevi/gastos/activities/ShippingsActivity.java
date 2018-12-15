@@ -35,6 +35,7 @@ import java.util.List;
 
 import static com.josevi.gastos.utils.Constantes.SHIPPINGS_GRAPHS_CARD_PERCENT_CHARTS_NUMBER;
 import static com.josevi.gastos.utils.Constantes.SHIPPINGS_GRAPHS_CARD_TOTAL_CHARTS_NUMBER;
+import static com.josevi.gastos.utils.Constantes.SHIPPINGS_GRAPHS_CARD_WEEKLY_TOTAL_CHARTS_NUMBER;
 import static com.josevi.gastos.utils.Constantes.monthYearFormatter;
 import static com.prolificinteractive.materialcalendarview.MaterialCalendarView.SELECTION_MODE_SINGLE;
 import static com.prolificinteractive.materialcalendarview.MaterialCalendarView.SHOW_NONE;
@@ -252,6 +253,7 @@ public class ShippingsActivity extends AppCompatActivity {
         List<Card> cards = new ArrayList<Card>();
         cards.add(new Card(R.layout.card_shipping_graphs_percent_charts, SHIPPINGS_GRAPHS_CARD_PERCENT_CHARTS_NUMBER));
         cards.add(new Card(R.layout.card_shipping_graphs_total_charts, SHIPPINGS_GRAPHS_CARD_TOTAL_CHARTS_NUMBER));
+        cards.add(new Card(R.layout.card_shipping_graphs_weekly_total_charts, SHIPPINGS_GRAPHS_CARD_WEEKLY_TOTAL_CHARTS_NUMBER));
         graphsCardsContainer.setLayoutManager(new LinearLayoutManager(this));
         graphsCardsContainer.setAdapter(new ShippingGraphsCardsViewAdapter(cards, this));
     }

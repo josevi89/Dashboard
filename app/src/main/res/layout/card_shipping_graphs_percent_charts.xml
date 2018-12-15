@@ -76,6 +76,8 @@
             android:layout_height="wrap_content"
             android:clipChildren="false"
             android:orientation="horizontal"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="5dp"
             android:weightSum="2"
             android:layout_below="@id/shipping_graphs_percent_charts_principal_chart_container"
             android:id="@+id/shipping_graphs_percent_charts_store_percents_container">
